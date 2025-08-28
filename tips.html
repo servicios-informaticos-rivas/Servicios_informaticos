@@ -56,60 +56,39 @@
 <footer class="bg-dark text-white text-center py-3">© 2025 Servicios Informáticos Rivas</footer>
 
 <script>
-const data = [
-  // APPLE - modelos variados
-  { marca: "Apple", modelo: "iPhone 12", problema: "No enciende", solucion: "Carga mínimo 30 min. Luego presiona Vol+ y Power hasta que aparezca el logo." },
-  { marca: "Apple", modelo: "iPhone 12", problema: "Pantalla negra", solucion: "Forzar reinicio: Vol+ Vol- y botón Power." },
-  { marca: "Apple", modelo: "iPhone 12", problema: "No carga", solucion: "Verifica cable, cargador y puerto. Reinicia dispositivo." },
-  { marca: "Apple", modelo: "iPhone 13", problema: "Batería baja rápido", solucion: "Cierra apps en segundo plano y desactiva ubicación cuando no se use." },
-  { marca: "Apple", modelo: "iPhone 14 Pro", problema: "Se calienta", solucion: "Evita apps exigentes y reduce brillo. Reinicia si persiste." },
-  { marca: "Apple", modelo: "iPhone 15", problema: "No reconoce SIM", solucion: "Saca SIM, limpia y vuelve a colocar. Reinicia dispositivo." },
-  { marca: "Apple", modelo: "iPhone 16", problema: "WiFi lento", solucion: "Olvida la red y vuelve a conectar. Reinicia router si es necesario." },
+// URL del Google Sheet publicado como CSV
+const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSHKGWIOfxqSo9ZVT_AqDXxasu7o84WWgxJcGu1g5kOE0re4VJY8LNcgGA78-HEK7wLdAalj-lH-C8t/pub?gid=0&single=true&output=csv";
 
-  // SAMSUNG - Serie S (alta)
-  { marca: "Samsung", modelo: "Galaxy S23 Ultra", problema: "No enciende", solucion: "Carga mínimo 1h y reinicio forzado: Vol- + Power." },
-  { marca: "Samsung", modelo: "Galaxy S23 Ultra", problema: "Pantalla negra", solucion: "Reinicio forzado y verifica brillo adaptativo." },
-  { marca: "Samsung", modelo: "Galaxy S24", problema: "No detecta SIM", solucion: "Retira SIM, limpia, reinicia equipo." },
-  
-  // SAMSUNG - Serie A (media)
-  { marca: "Samsung", modelo: "Galaxy A14", problema: "Lento", solucion: "Borra caché y desactiva apps en segundo plano." },
-  { marca: "Samsung", modelo: "Galaxy A14", problema: "Batería baja rápido", solucion: "Activa ahorro de energía y reduce brillo." },
-  { marca: "Samsung", modelo: "Galaxy A15", problema: "No carga", solucion: "Prueba otro cable y cargador original." },
-  { marca: "Samsung", modelo: "Galaxy A15", problema: "Se calienta", solucion: "Evita juegos pesados y reinicia el dispositivo." },
-
-  // SAMSUNG - Serie M (baja)
-  { marca: "Samsung", modelo: "Galaxy M13", problema: "Pantalla congelada", solucion: "Reinicio forzado: Vol- + Power." },
-  { marca: "Samsung", modelo: "Galaxy M13", problema: "Batería dura poco", solucion: "Cierra apps en segundo plano y baja brillo." },
-
-  // XIAOMI - Redmi (media/baja)
-  { marca: "Xiaomi", modelo: "Redmi Note 12", problema: "Cámara borrosa", solucion: "Limpia lente y reinicia app de cámara." },
-  { marca: "Xiaomi", modelo: "Redmi Note 12", problema: "No carga", solucion: "Prueba otro cable o cargador original." },
-  { marca: "Xiaomi", modelo: "Redmi 11", problema: "Pantalla negra", solucion: "Forzar reinicio: Vol+ Vol- + Power." },
-
-  // XIAOMI - Serie alta
-  { marca: "Xiaomi", modelo: "Xiaomi 14 Ultra", problema: "Se calienta", solucion: "Evita apps pesadas, reinicia si persiste." },
-  { marca: "Xiaomi", modelo: "Xiaomi 14 Ultra", problema: "WiFi inestable", solucion: "Olvida la red y vuelve a conectar. Reinicia router." },
-
-  // OPPO
-  { marca: "Oppo", modelo: "Oppo A57", problema: "Batería dura poco", solucion: "Activa ahorro energía y cierra apps activas." },
-  { marca: "Oppo", modelo: "Oppo Reno9", problema: "No enciende", solucion: "Carga 30 min y reinicia forzado." },
-  { marca: "Oppo", modelo: "Oppo Reno9", problema: "Pantalla congelada", solucion: "Reinicio forzado: Vol+ Vol- + Power." },
-
-  // VIVO
-  { marca: "Vivo", modelo: "Vivo Y100", problema: "No enciende", solucion: "Carga mínima 30 min y reinicia." },
-  { marca: "Vivo", modelo: "Vivo X100", problema: "Batería dura poco", solucion: "Cierra apps en segundo plano y reduce brillo." },
-  { marca: "Vivo", modelo: "Vivo X100", problema: "Cámara borrosa", solucion: "Limpia lente y reinicia app de cámara." }
-];
-
+// Variables
+let data = [];
 const brandSelect = document.getElementById("brandSelect");
 const modelSelect = document.getElementById("modelSelect");
 const problemSelect = document.getElementById("problemSelect");
 const solutionBox = document.getElementById("solutionBox");
 const solutionSteps = document.getElementById("solutionSteps");
 
-// Llenar marcas
-const marcas = [...new Set(data.map(d => d.marca))].sort();
-marcas.forEach(m => brandSelect.innerHTML += `<option value="${m}">${m}</option>`);
+// Cargar datos del Sheet
+async function loadData() {
+  try {
+    const res = await fetch(sheetUrl);
+    const text = await res.text();
+    const rows = text.split(/\r?\n/).map(r => r.split(","));
+    // Asumo que la primera fila es encabezado: Marca,Modelo,Problema,Solucion
+    data = rows.slice(1).map(r => ({
+      marca: r[0]?.trim(),
+      modelo: r[1]?.trim(),
+      problema: r[2]?.trim(),
+      solucion: r[3]?.trim()
+    })).filter(d => d.marca && d.modelo && d.problema && d.solucion);
+
+    // Llenar marcas
+    const marcas = [...new Set(data.map(d => d.marca))].sort();
+    marcas.forEach(m => brandSelect.innerHTML += `<option value="${m}">${m}</option>`);
+  } catch (err) {
+    console.error("Error cargando datos:", err);
+    alert("No se pudieron cargar los datos del Google Sheet.");
+  }
+}
 
 // Eventos
 brandSelect.addEventListener('change', () => {
@@ -152,6 +131,9 @@ problemSelect.addEventListener('change', () => {
     solutionBox.style.display = 'block';
   }
 });
+
+// Iniciar
+loadData();
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
