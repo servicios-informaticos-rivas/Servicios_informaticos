@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tips para Celulares - Servicios Informáticos Rivas</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    .solution-box { margin-top: 15px; padding: 15px; border-radius: 8px; background-color: #e9f7ef; display: none; }
+    .hard-reset { color: red; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<header class="bg-primary text-white text-center p-4">
+  <h1>Servicios Informáticos Rivas</h1>
+  <p>Tips y soluciones para celulares</p>
+</header>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Menú</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house"></i> Inicio</a></li>
+        <li class="nav-item"><a class="nav-link" href="reparacion.html"><i class="bi bi-tools"></i> Reparación de PC</a></li>
+        <li class="nav-item"><a class="nav-link" href="laptops.html"><i class="bi bi-laptop"></i> Laptops</a></li>
+        <li class="nav-item"><a class="nav-link" href="repuestos.html"><i class="bi bi-cpu"></i> Venta de Repuestos</a></li>
+        <li class="nav-item"><a class="nav-link" href="camaras.html"><i class="bi bi-camera-video"></i> Cámaras de Seguridad</a></li>
+        <li class="nav-item"><a class="nav-link" href="redes.html"><i class="bi bi-wifi"></i> Puntos de Red</a></li>
+        <li class="nav-item"><a class="nav-link" href="apk.html"><i class="bi bi-android2"></i> Creación de APK</a></li>
+        <li class="nav-item"><a class="nav-link active" href="tips.html"><i class="bi bi-phone"></i> Tips para Celulares</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="container my-5">
+  <div class="text-center mb-4"><h2>Selecciona tu celular y problema</h2></div>
+
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="mb-3"><label>Marca</label><select id="brandSelect" class="form-select"><option value="">-- Elige una marca --</option></select></div>
+      <div class="mb-3"><label>Modelo</label><select id="modelSelect" class="form-select" disabled><option value="">-- Primero selecciona la marca --</option></select></div>
+      <div class="mb-3"><label>Problema</label><select id="problemSelect" class="form-select" disabled><option value="">-- Primero selecciona el modelo --</option></select></div>
+
+      <div class="solution-box" id="solutionBox"><h5>Solución paso a paso:</h5><ol id="solutionSteps"></ol></div>
+    </div>
+  </div>
+</main>
+
+<footer class="bg-dark text-white text-center py-3">© 2025 Servicios Informáticos Rivas</footer>
+
+<script>
+const data = [
+  // APPLE - modelos variados
+  { marca: "Apple", modelo: "iPhone 12", problema: "No enciende", solucion: "Carga mínimo 30 min. Luego presiona Vol+ y Power hasta que aparezca el logo." },
+  { marca: "Apple", modelo: "iPhone 12", problema: "Pantalla negra", solucion: "Forzar reinicio: Vol+ Vol- y botón Power." },
+  { marca: "Apple", modelo: "iPhone 12", problema: "No carga", solucion: "Verifica cable, cargador y puerto. Reinicia dispositivo." },
+  { marca: "Apple", modelo: "iPhone 13", problema: "Batería baja rápido", solucion: "Cierra apps en segundo plano y desactiva ubicación cuando no se use." },
+  { marca: "Apple", modelo: "iPhone 14 Pro", problema: "Se calienta", solucion: "Evita apps exigentes y reduce brillo. Reinicia si persiste." },
+  { marca: "Apple", modelo: "iPhone 15", problema: "No reconoce SIM", solucion: "Saca SIM, limpia y vuelve a colocar. Reinicia dispositivo." },
+  { marca: "Apple", modelo: "iPhone 16", problema: "WiFi lento", solucion: "Olvida la red y vuelve a conectar. Reinicia router si es necesario." },
+
+  // SAMSUNG - Serie S (alta)
+  { marca: "Samsung", modelo: "Galaxy S23 Ultra", problema: "No enciende", solucion: "Carga mínimo 1h y reinicio forzado: Vol- + Power." },
+  { marca: "Samsung", modelo: "Galaxy S23 Ultra", problema: "Pantalla negra", solucion: "Reinicio forzado y verifica brillo adaptativo." },
+  { marca: "Samsung", modelo: "Galaxy S24", problema: "No detecta SIM", solucion: "Retira SIM, limpia, reinicia equipo." },
+  
+  // SAMSUNG - Serie A (media)
+  { marca: "Samsung", modelo: "Galaxy A14", problema: "Lento", solucion: "Borra caché y desactiva apps en segundo plano." },
+  { marca: "Samsung", modelo: "Galaxy A14", problema: "Batería baja rápido", solucion: "Activa ahorro de energía y reduce brillo." },
+  { marca: "Samsung", modelo: "Galaxy A15", problema: "No carga", solucion: "Prueba otro cable y cargador original." },
+  { marca: "Samsung", modelo: "Galaxy A15", problema: "Se calienta", solucion: "Evita juegos pesados y reinicia el dispositivo." },
+
+  // SAMSUNG - Serie M (baja)
+  { marca: "Samsung", modelo: "Galaxy M13", problema: "Pantalla congelada", solucion: "Reinicio forzado: Vol- + Power." },
+  { marca: "Samsung", modelo: "Galaxy M13", problema: "Batería dura poco", solucion: "Cierra apps en segundo plano y baja brillo." },
+
+  // XIAOMI - Redmi (media/baja)
+  { marca: "Xiaomi", modelo: "Redmi Note 12", problema: "Cámara borrosa", solucion: "Limpia lente y reinicia app de cámara." },
+  { marca: "Xiaomi", modelo: "Redmi Note 12", problema: "No carga", solucion: "Prueba otro cable o cargador original." },
+  { marca: "Xiaomi", modelo: "Redmi 11", problema: "Pantalla negra", solucion: "Forzar reinicio: Vol+ Vol- + Power." },
+
+  // XIAOMI - Serie alta
+  { marca: "Xiaomi", modelo: "Xiaomi 14 Ultra", problema: "Se calienta", solucion: "Evita apps pesadas, reinicia si persiste." },
+  { marca: "Xiaomi", modelo: "Xiaomi 14 Ultra", problema: "WiFi inestable", solucion: "Olvida la red y vuelve a conectar. Reinicia router." },
+
+  // OPPO
+  { marca: "Oppo", modelo: "Oppo A57", problema: "Batería dura poco", solucion: "Activa ahorro energía y cierra apps activas." },
+  { marca: "Oppo", modelo: "Oppo Reno9", problema: "No enciende", solucion: "Carga 30 min y reinicia forzado." },
+  { marca: "Oppo", modelo: "Oppo Reno9", problema: "Pantalla congelada", solucion: "Reinicio forzado: Vol+ Vol- + Power." },
+
+  // VIVO
+  { marca: "Vivo", modelo: "Vivo Y100", problema: "No enciende", solucion: "Carga mínima 30 min y reinicia." },
+  { marca: "Vivo", modelo: "Vivo X100", problema: "Batería dura poco", solucion: "Cierra apps en segundo plano y reduce brillo." },
+  { marca: "Vivo", modelo: "Vivo X100", problema: "Cámara borrosa", solucion: "Limpia lente y reinicia app de cámara." }
+];
+
+const brandSelect = document.getElementById("brandSelect");
+const modelSelect = document.getElementById("modelSelect");
+const problemSelect = document.getElementById("problemSelect");
+const solutionBox = document.getElementById("solutionBox");
+const solutionSteps = document.getElementById("solutionSteps");
+
+// Llenar marcas
+const marcas = [...new Set(data.map(d => d.marca))].sort();
+marcas.forEach(m => brandSelect.innerHTML += `<option value="${m}">${m}</option>`);
+
+// Eventos
+brandSelect.addEventListener('change', () => {
+  const mar = brandSelect.value;
+  modelSelect.innerHTML = `<option value="">-- Elige un modelo --</option>`;
+  problemSelect.innerHTML = `<option value="">-- Primero selecciona el modelo --</option>`;
+  solutionBox.style.display = 'none';
+  modelSelect.disabled = !mar;
+
+  if (mar) {
+    const modelos = [...new Set(data.filter(d => d.marca === mar).map(d => d.modelo))];
+    modelos.sort().forEach(mo => modelSelect.innerHTML += `<option value="${mo}">${mo}</option>`);
+  }
+});
+
+modelSelect.addEventListener('change', () => {
+  const mar = brandSelect.value, mo = modelSelect.value;
+  problemSelect.innerHTML = `<option value="">-- Elige un problema --</option>`;
+  solutionBox.style.display = 'none';
+  problemSelect.disabled = !mo;
+
+  if (mo) {
+    const props = data.filter(d => d.marca === mar && d.modelo === mo).map(d => d.problema);
+    [...new Set(props)].forEach(p => problemSelect.innerHTML += `<option value="${p}">${p}</option>`);
+  }
+});
+
+problemSelect.addEventListener('change', () => {
+  const mar = brandSelect.value, mo = modelSelect.value, pr = problemSelect.value;
+  const item = data.find(d => d.marca === mar && d.modelo === mo && d.problema === pr);
+  if (item) {
+    solutionSteps.innerHTML = "";
+    item.solucion.split(/\. /).forEach(step => {
+      if(step.trim()==="") return;
+      const li = document.createElement('li');
+      li.textContent = step;
+      if(step.toLowerCase().includes('hard reset')) li.classList.add('hard-reset');
+      solutionSteps.appendChild(li);
+    });
+    solutionBox.style.display = 'block';
+  }
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
