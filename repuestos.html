@@ -6,70 +6,148 @@
   <title>Servicios Informáticos Rivas</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    img { border: 2px solid #ccc; transition: transform 0.3s ease; max-height: 200px; }
-    img:hover { transform: scale(1.05); }
-    body { background-color: #f9f9f9; }
+    body {
+      background-color: #f9f9f9;
+      font-family: 'Roboto', sans-serif;
+    }
+    header {
+      background: linear-gradient(135deg, #007bff, #0056b3);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    img {
+      border: 3px solid #eaeaea;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      max-height: 220px;
+    }
+    img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    h2, h3 {
+      font-weight: 700;
+      color: #333;
+    }
+    .card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border-radius: 12px;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+    footer {
+      background: #222;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
-  <header class="bg-primary text-white text-center p-4">
-    <h1>Servicios Informáticos Rivas</h1>
-    <p>Reparación, Redes, Cámaras, Repuestos y más</p>
+  <!-- Encabezado -->
+  <header class="text-white text-center p-4">
+    <h1 class="mb-1">Servicios Informáticos Rivas</h1>
+    <p class="mb-0">Reparación, Redes, Cámaras, Repuestos y más</p>
   </header>
 
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">Menú</a>
+  <!-- Menú -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="#">Menú</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navMenu">
-        <ul class="navbar-nav">
+        <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house"></i> Inicio</a></li>
           <li class="nav-item"><a class="nav-link" href="reparacion.html"><i class="bi bi-tools"></i> Reparación de PC</a></li>
           <li class="nav-item"><a class="nav-link" href="laptops.html"><i class="bi bi-laptop"></i> Laptops</a></li>
           <li class="nav-item"><a class="nav-link active" href="repuestos.html"><i class="bi bi-cpu"></i> Venta de Repuestos</a></li>
-          <li class="nav-item"><a class="nav-link" href="camaras.html"><i class="bi bi-camera-video"></i> Cámaras de Seguridad</a></li>
-          <li class="nav-item"><a class="nav-link" href="redes.html"><i class="bi bi-wifi"></i> Puntos de Red</a></li>
-          <li class="nav-item"><a class="nav-link" href="apk.html"><i class="bi bi-android2"></i> Creación de APK</a></li>
-          <li class="nav-item"><a class="nav-link" href="tips.html"><i class="bi bi-phone"></i> Tips para Celulares</a></li>
+          <li class="nav-item"><a class="nav-link" href="camaras.html"><i class="bi bi-camera-video"></i> Cámaras</a></li>
+          <li class="nav-item"><a class="nav-link" href="redes.html"><i class="bi bi-wifi"></i> Redes</a></li>
+          <li class="nav-item"><a class="nav-link" href="apk.html"><i class="bi bi-android2"></i> APK</a></li>
+          <li class="nav-item"><a class="nav-link" href="tips.html"><i class="bi bi-phone"></i> Tips</a></li>
         </ul>
       </div>
     </div>
   </nav>
-  <main class="container my-4">
 
-  <h2 class="text-center">Venta de Repuestos</h2>
-  <p class="text-center">
-    Contamos con un servicio especializado de <strong>venta de repuestos para computadoras, laptops y accesorios</strong>.  
-    No mantenemos inventario físico, sino que trabajamos bajo pedido, realizando la <strong>cotización directa con nuestros proveedores</strong> para conseguir el repuesto que necesite su equipo al mejor precio posible.  
-    Esto nos permite ofrecer <strong>productos de calidad, originales o compatibles</strong>, adaptados a su presupuesto y necesidad.
-  </p>
-  <p class="text-center">
-    Algunos repuestos que podemos conseguir:
-    <ul class="text-center list-unstyled">
-      <li>💽 Discos duros (HDD, SSD)</li>
-      <li>💾 Memorias RAM</li>
-      <li>🔌 Fuentes de poder</li>
-      <li>🖥️ Tarjetas madre y tarjetas gráficas</li>
-      <li>🔧 Cargadores y baterías para laptops</li>
-    </ul>
-  </p>
+  <!-- Contenido principal -->
+  <main class="container my-5">
+    <h2 class="text-center mb-4">Venta de Repuestos</h2>
+    <p class="text-center lead">
+      Ofrecemos <strong>repuestos para computadoras, laptops y accesorios</strong>.  
+      Trabajamos bajo pedido directo con proveedores para garantizar <strong>productos originales o compatibles</strong>, 
+      siempre al mejor precio y ajustados a tu necesidad.
+    </p>
 
-  <div class="text-center my-4">
-    <img src="imagenes/repuestos.jpg" alt="Servicio de repuestos" class="img-fluid rounded" />
-  </div>
+    <!-- Grid de repuestos -->
+    <div class="row g-4 mt-4">
+      <div class="col-md-4">
+        <div class="card text-center h-100 p-3">
+          <i class="bi bi-hdd-network display-4 text-primary"></i>
+          <div class="card-body">
+            <h5 class="card-title">Discos duros</h5>
+            <p class="card-text">HDD y SSD de distintas capacidades para mayor velocidad y almacenamiento.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card text-center h-100 p-3">
+          <i class="bi bi-memory display-4 text-success"></i>
+          <div class="card-body">
+            <h5 class="card-title">Memorias RAM</h5>
+            <p class="card-text">DDR3, DDR4 y DDR5 según compatibilidad de tu equipo.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card text-center h-100 p-3">
+          <i class="bi bi-plug display-4 text-warning"></i>
+          <div class="card-body">
+            <h5 class="card-title">Fuentes de poder</h5>
+            <p class="card-text">Modelos certificados para garantizar energía estable y confiable.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card text-center h-100 p-3">
+          <i class="bi bi-gpu-card display-4 text-danger"></i>
+          <div class="card-body">
+            <h5 class="card-title">Tarjetas madre y gráficas</h5>
+            <p class="card-text">Componentes actualizados para mayor rendimiento y expansión.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card text-center h-100 p-3">
+          <i class="bi bi-battery-charging display-4 text-info"></i>
+          <div class="card-body">
+            <h5 class="card-title">Cargadores y baterías</h5>
+            <p class="card-text">Accesorios originales y genéricos compatibles para laptops.</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <p class="text-center">
-    Si necesita un repuesto, <strong>contáctenos por WhatsApp</strong> y en menos de 24 horas le enviamos la cotización sin compromiso.
-  </p>
+    <!-- Imagen decorativa -->
+    <div class="text-center my-5">
+      <img src="imagenes/repuestos.jpg" alt="Servicio de repuestos" class="img-fluid rounded shadow-lg" />
+    </div>
 
-</main>
+    <!-- Contacto -->
+    <div class="alert alert-info text-center shadow-sm">
+      📞 Contáctanos por <strong>WhatsApp</strong> y recibe tu cotización en menos de 24 horas.
+    </div>
+  </main>
 
-  <footer class="bg-dark text-white text-center py-3">
-    © 2025 Servicios Informáticos - Contacto: WhatsApp 8818-0392, 8614-8357, 8419-8178
+  <!-- Pie de página -->
+  <footer class="text-white text-center py-4">
+    <p class="mb-1">© 2025 Servicios Informáticos Rivas</p>
+    <p class="mb-0">WhatsApp: 8818-0392 | 8614-8357 | 8419-8178</p>
   </footer>
+
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
