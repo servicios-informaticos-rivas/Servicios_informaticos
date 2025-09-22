@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Servicios Informáticos Rivas</title>
+  <title>Venta de Repuestos - Servicios Informáticos Rivas</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
@@ -12,10 +12,39 @@
       background-color: #f9f9f9;
       font-family: 'Roboto', sans-serif;
     }
-    header {
-      background: linear-gradient(135deg, #007bff, #0056b3);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+
+    /* Encabezado animado */
+    .header-hero {
+      height: 220px;
+      background: linear-gradient(270deg, #007bff, #6610f2, #17a2b8);
+      background-size: 600% 600%;
+      animation: gradientMove 12s ease infinite;
+      text-shadow: 1px 1px 6px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-align: center;
     }
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .header-hero h1 { font-weight: bold; animation: fadeInDown 1s ease; }
+    .header-hero p { font-size: 1.2rem; animation: fadeInUp 1s ease; }
+    @keyframes fadeInDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+    /* Navbar sticky */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    /* Imagen con efecto hover */
     img {
       border: 3px solid #eaeaea;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -25,10 +54,8 @@
       transform: scale(1.05);
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
-    h2, h3 {
-      font-weight: 700;
-      color: #333;
-    }
+
+    /* Tarjetas con animación */
     .card {
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       border-radius: 12px;
@@ -41,22 +68,20 @@
     .card:nth-child(3) { animation-delay: 0.3s; }
     .card:nth-child(4) { animation-delay: 0.4s; }
     .card:nth-child(5) { animation-delay: 0.5s; }
+    @keyframes fadeInUp { to { opacity:1; transform:translateY(0); } }
 
-    @keyframes fadeInUp {
-      to { opacity: 1; transform: translateY(0); }
-    }
+    /* Listas modernas */
+    ul li::before { content: "✔ "; color: #28a745; font-weight: bold; }
+    ol li::marker { color: #ffc107; font-weight: bold; }
 
+    /* Footer */
     footer {
-      background: #222;
+      background: #111;
+      color: #aaa;
       font-size: 0.9rem;
     }
-    footer a {
-      color: #0dcaf0;
-      text-decoration: none;
-    }
-    footer a:hover {
-      text-decoration: underline;
-    }
+    footer a { color: #0dcaf0; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
 
     /* Botón flotante de WhatsApp */
     .whatsapp-float {
@@ -68,25 +93,24 @@
       border-radius: 50%;
       width: 60px;
       height: 60px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 2rem;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      font-size:2rem;
+      box-shadow:0 4px 10px rgba(0,0,0,0.3);
       transition: transform 0.3s ease;
-      z-index: 1000;
+      z-index:1000;
     }
-    .whatsapp-float:hover {
-      transform: scale(1.1);
-      background-color: #1ebe5d;
-    }
+    .whatsapp-float:hover { transform: scale(1.1); background-color: #1ebe5d; }
+
   </style>
 </head>
 <body>
-  <!-- Encabezado -->
-  <header class="text-white text-center p-4">
-    <h1 class="mb-1">Servicios Informáticos Rivas</h1>
-    <p class="mb-0">Reparación, Redes, Cámaras, Repuestos y más</p>
+
+  <!-- Encabezado animado -->
+  <header class="header-hero">
+    <h1><i class="bi bi-cpu"></i> Venta de Repuestos</h1>
+    <p>Discos, memorias, fuentes, tarjetas y más, al mejor precio</p>
   </header>
 
   <!-- Menú -->
@@ -180,8 +204,8 @@
     </div>
   </main>
 
-  <!-- Pie de página -->
-  <footer class="text-white text-center py-4">
+  <!-- Footer -->
+  <footer class="text-center py-4">
     <p class="mb-1">© 2025 Servicios Informáticos Rivas</p>
     <p class="mb-0">
       WhatsApp: <a href="https://wa.me/50588180392" target="_blank">8818-0392</a> | 
@@ -190,7 +214,7 @@
     </p>
   </footer>
 
-  <!-- Botón flotante de WhatsApp -->
+  <!-- Botón flotante WhatsApp -->
   <a href="https://wa.me/50588180392" class="whatsapp-float" target="_blank">
     <i class="bi bi-whatsapp"></i>
   </a>
