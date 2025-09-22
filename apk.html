@@ -12,10 +12,49 @@
       background-color: #f9f9f9;
       font-family: 'Roboto', sans-serif;
     }
-    header {
-      background: linear-gradient(135deg, #007bff, #0056b3);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+
+    /* Encabezado animado */
+    .header-hero {
+      height: 220px;
+      background: linear-gradient(270deg, #007bff, #6610f2, #17a2b8);
+      background-size: 600% 600%;
+      animation: gradientMove 12s ease infinite;
+      text-shadow: 1px 1px 6px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      text-align: center;
     }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .header-hero h1 {
+      font-weight: bold;
+      font-size: 2.2rem;
+      animation: fadeInDown 1s ease;
+    }
+
+    .header-hero p {
+      font-size: 1.2rem;
+      animation: fadeInUp 1s ease;
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     img {
       border: 3px solid #eaeaea;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -25,13 +64,16 @@
       transform: scale(1.05);
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
+
     h2, h3 {
       font-weight: 700;
       color: #333;
     }
+
     footer {
       background: #222;
       font-size: 0.9rem;
+      color: #aaa;
     }
     footer a {
       color: #0dcaf0;
@@ -43,10 +85,11 @@
   </style>
 </head>
 <body>
-  <!-- Encabezado -->
-  <header class="text-white text-center p-4">
-    <h1 class="mb-1">Servicios Informáticos Rivas</h1>
-    <p class="mb-0">Creación de APK para proyectos escolares</p>
+
+  <!-- Encabezado animado -->
+  <header class="header-hero">
+    <h1><i class="bi bi-android2"></i> Servicios Informáticos Rivas</h1>
+    <p>Creación de APK para proyectos escolares</p>
   </header>
 
   <!-- Menú -->
