@@ -3,62 +3,119 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Servicios Informáticos Rivas</title>
+  <title>Reparación de PC - Servicios Informáticos Rivas</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
   <style>
+    /* Header con fondo degradado animado */
+    .header-hero {
+      height: 220px;
+      background: linear-gradient(270deg, #007bff, #6610f2, #17a2b8);
+      background-size: 600% 600%;
+      animation: gradientMove 12s ease infinite;
+      text-shadow: 1px 1px 6px rgba(0,0,0,0.5);
+    }
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .header-hero h1 {
+      font-weight: bold;
+      animation: fadeInDown 1s ease;
+    }
+    .header-hero p {
+      font-size: 1.2rem;
+      animation: fadeInUp 1s ease;
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Navbar sticky */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    /* Imagen con efecto hover */
     img {
       border: 2px solid #ccc;
       transition: transform 0.3s ease;
-      max-height: 200px;
+      max-height: 220px;
     }
-    img:hover {
-      transform: scale(1.05);
+    img:hover { transform: scale(1.05); }
+
+    /* Listas más modernas */
+    ul li::before {
+      content: "✔ ";
+      color: #28a745;
+      font-weight: bold;
     }
-    body {
-      background-color: #f9f9f9;
+    ol li::marker {
+      color: #ffc107;
+      font-weight: bold;
+    }
+
+    /* Footer moderno */
+    footer {
+      background: #111;
+      color: #aaa;
+    }
+    footer a {
+      color: #fff;
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <header class="bg-primary text-white text-center p-4">
-    <h1>Servicios Informáticos Rivas</h1>
-    <p>Reparación, Redes, Cámaras, Repuestos y más</p>
+
+  <!-- Encabezado -->
+  <header class="header-hero text-white text-center d-flex flex-column justify-content-center align-items-center">
+    <h1><i class="bi bi-tools"></i> Reparación de PC</h1>
+    <p>Diagnóstico, cambio de piezas, limpieza y formateo</p>
   </header>
 
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <!-- Menú -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">Menú</a>
+      <a class="navbar-brand fw-bold" href="index.html"><i class="bi bi-cpu"></i> SIR</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navMenu">
-        <ul class="navbar-nav">
+        <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house"></i> Inicio</a></li>
-          <li class="nav-item"><a class="nav-link active" href="reparacion.html"><i class="bi bi-tools"></i> Reparación de PC</a></li>
+          <li class="nav-item"><a class="nav-link active" href="reparacion.html"><i class="bi bi-tools"></i> Reparación</a></li>
           <li class="nav-item"><a class="nav-link" href="laptops.html"><i class="bi bi-laptop"></i> Laptops</a></li>
-          <li class="nav-item"><a class="nav-link" href="repuestos.html"><i class="bi bi-cpu"></i> Venta de Repuestos</a></li>
-          <li class="nav-item"><a class="nav-link" href="camaras.html"><i class="bi bi-camera-video"></i> Cámaras de Seguridad</a></li>
-          <li class="nav-item"><a class="nav-link" href="redes.html"><i class="bi bi-wifi"></i> Puntos de Red</a></li>
-          <li class="nav-item"><a class="nav-link" href="apk.html"><i class="bi bi-android2"></i> Creación de APK</a></li>
-          <li class="nav-item"><a class="nav-link" href="tips.html"><i class="bi bi-phone"></i> Tips para Celulares</a></li>
+          <li class="nav-item"><a class="nav-link" href="repuestos.html"><i class="bi bi-cpu"></i> Repuestos</a></li>
+          <li class="nav-item"><a class="nav-link" href="camaras.html"><i class="bi bi-camera-video"></i> Cámaras</a></li>
+          <li class="nav-item"><a class="nav-link" href="redes.html"><i class="bi bi-wifi"></i> Redes</a></li>
+          <li class="nav-item"><a class="nav-link" href="apk.html"><i class="bi bi-android2"></i> APK</a></li>
+          <li class="nav-item"><a class="nav-link" href="tips.html"><i class="bi bi-phone"></i> Tips</a></li>
         </ul>
       </div>
     </div>
   </nav>
 
-    <main class="container my-4">
-    <h2 class="text-center">Reparación de PC</h2>
-    <p class="text-center">Realizamos diagnóstico, cambio de piezas, limpieza interna y formateo.</p>
-
-    <!-- Imagen -->
+  <!-- Contenido -->
+  <main class="container my-5">
     <div class="text-center my-4">
-      <img src="imagenes/Pc.jpg" alt="Servicio de reparación" class="img-fluid rounded" />
+      <img src="imagenes/Pc.jpg" alt="Servicio de reparación" class="img-fluid rounded shadow" />
     </div>
 
-    <!-- NUEVA SECCIÓN -->
     <section class="mt-5">
-      <h3 class="text-primary">Todo sobre las Computadoras</h3>
+      <h3 class="text-primary"><i class="bi bi-pc-display"></i> Todo sobre las Computadoras</h3>
       <p>
         Una computadora es una herramienta indispensable en el hogar y en el trabajo. 
         Sin embargo, con el tiempo pueden aparecer fallos como lentitud, sobrecalentamiento 
@@ -66,7 +123,7 @@
         atienden a tiempo.
       </p>
 
-      <h4 class="mt-4 text-success">Problemas más comunes que atiendo:</h4>
+      <h4 class="mt-4 text-success"><i class="bi bi-bug"></i> Problemas más comunes que atiendo:</h4>
       <ul>
         <li>Lentitud extrema y pantallas de carga prolongadas.</li>
         <li>Virus, malware o software no deseado.</li>
@@ -75,7 +132,7 @@
         <li>Sobrecalentamiento por acumulación de polvo.</li>
       </ul>
 
-      <h4 class="mt-4 text-warning">Consejos para prolongar la vida de tu PC:</h4>
+      <h4 class="mt-4 text-warning"><i class="bi bi-lightbulb"></i> Consejos para prolongar la vida de tu PC:</h4>
       <ol>
         <li>Realizar limpieza interna al menos una vez al año.</li>
         <li>Actualizar el sistema operativo y programas regularmente.</li>
@@ -84,21 +141,29 @@
         <li>Hacer copias de seguridad de tus archivos importantes.</li>
       </ol>
 
-      <div class="alert alert-info mt-4">
+      <div class="alert alert-info mt-4 shadow-sm">
         💡 <strong>Tip:</strong> Si notas que tu computadora está más lenta de lo normal, 
-        podría necesitar una optimización o un cambio de disco a tecnología SSD para 
-        mejorar su velocidad hasta 10 veces.
+        podría necesitar una optimización o un cambio a un disco SSD para mejorar su velocidad hasta 10 veces.
       </div>
     </section>
   </main>
 
-  <footer class="bg-dark text-white text-center py-3">
-    © 2025 Servicios Informáticos - Contacto: WhatsApp 8818-0392, 8614-8357, 8419-8178
+  <!-- Footer -->
+  <footer class="text-center py-4">
+    <p>© 2025 Servicios Informáticos Rivas</p>
+    <p>
+      <i class="bi bi-whatsapp"></i> 
+      <a href="https://wa.me/50588180392" target="_blank">8818-0392</a> | 
+      <a href="https://wa.me/50586148357" target="_blank">8614-8357</a> | 
+      <a href="https://wa.me/50584198178" target="_blank">8419-8178</a>
+    </p>
   </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script src="https://cdn.botpress.cloud/webchat/v3.2/inject.js" defer></script>
-<script src="https://files.bpcontent.cloud/2025/08/11/23/20250811230929-AYMVBFEW.js" defer></script>
+  <!-- Chat Botpress -->
+  <script src="https://cdn.botpress.cloud/webchat/v3.2/inject.js" defer></script>
+  <script src="https://files.bpcontent.cloud/2025/08/11/23/20250811230929-AYMVBFEW.js" defer></script>
 </body>
 </html>
