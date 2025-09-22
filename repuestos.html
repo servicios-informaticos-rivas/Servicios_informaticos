@@ -32,14 +32,53 @@
     .card {
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       border-radius: 12px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.8s ease forwards;
     }
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.3s; }
+    .card:nth-child(4) { animation-delay: 0.4s; }
+    .card:nth-child(5) { animation-delay: 0.5s; }
+
+    @keyframes fadeInUp {
+      to { opacity: 1; transform: translateY(0); }
     }
+
     footer {
       background: #222;
       font-size: 0.9rem;
+    }
+    footer a {
+      color: #0dcaf0;
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Botón flotante de WhatsApp */
+    .whatsapp-float {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #25d366;
+      color: white;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+    .whatsapp-float:hover {
+      transform: scale(1.1);
+      background-color: #1ebe5d;
     }
   </style>
 </head>
@@ -144,8 +183,17 @@
   <!-- Pie de página -->
   <footer class="text-white text-center py-4">
     <p class="mb-1">© 2025 Servicios Informáticos Rivas</p>
-    <p class="mb-0">WhatsApp: 8818-0392 | 8614-8357 | 8419-8178</p>
+    <p class="mb-0">
+      WhatsApp: <a href="https://wa.me/50588180392" target="_blank">8818-0392</a> | 
+      <a href="https://wa.me/50586148357" target="_blank">8614-8357</a> | 
+      <a href="https://wa.me/50584198178" target="_blank">8419-8178</a>
+    </p>
   </footer>
+
+  <!-- Botón flotante de WhatsApp -->
+  <a href="https://wa.me/50588180392" class="whatsapp-float" target="_blank">
+    <i class="bi bi-whatsapp"></i>
+  </a>
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
