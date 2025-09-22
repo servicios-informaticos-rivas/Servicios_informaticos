@@ -7,96 +7,139 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
   <style>
-    img { border: 2px solid #ccc; transition: transform 0.3s ease; max-height: 200px; }
+    body { background-color: #f9f9f9; font-family: "Segoe UI", Roboto, sans-serif; }
+    img { border: 2px solid #ccc; transition: transform 0.3s ease; max-height: 220px; }
     img:hover { transform: scale(1.05); }
-    body { background-color: #f9f9f9; }
+
+    /* Encabezado con gradiente animado */
+    header {
+      background: linear-gradient(270deg, #007bff, #6610f2, #17a2b8);
+      background-size: 600% 600%;
+      animation: gradientMove 12s ease infinite;
+      color: white;
+      padding: 3rem 1rem;
+    }
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    header h1 { font-weight: 700; margin-bottom: 0.5rem; }
+    header p { font-size: 1.2rem; opacity: 0.9; }
+
+    /* Navbar moderno */
+    .navbar-nav .nav-link {
+      transition: color 0.3s ease, transform 0.2s ease;
+    }
+    .navbar-nav .nav-link:hover {
+      color: #0dcaf0 !important;
+      transform: translateY(-2px);
+    }
+
+    /* Listas con íconos */
+    ul li::marker, ol li::marker { content: ""; }
+    ul li::before, ol li::before {
+      font-family: "Bootstrap-icons";
+      margin-right: 8px;
+      color: #0d6efd;
+    }
+    ul li::before { content: "\f26a"; } /* bi-check-circle */
+    ol li::before { content: "\f284"; } /* bi-dot */
+
+    /* Footer */
+    footer { background: #111; font-size: 0.9rem; }
+    footer a { color: #0dcaf0; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
-  <header class="bg-primary text-white text-center p-4">
-    <h1>Servicios Informáticos Rivas</h1>
+  <!-- Encabezado -->
+  <header class="text-center">
+    <h1><i class="bi bi-laptop"></i> Servicios Informáticos Rivas</h1>
     <p>Reparación, Redes, Cámaras, Repuestos y más</p>
   </header>
 
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">Menú</a>
+  <!-- Menú -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="#">Menú</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navMenu">
-        <ul class="navbar-nav">
+        <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house"></i> Inicio</a></li>
           <li class="nav-item"><a class="nav-link" href="reparacion.html"><i class="bi bi-tools"></i> Reparación de PC</a></li>
           <li class="nav-item"><a class="nav-link" href="laptops.html"><i class="bi bi-laptop"></i> Laptops</a></li>
           <li class="nav-item"><a class="nav-link" href="repuestos.html"><i class="bi bi-cpu"></i> Venta de Repuestos</a></li>
-          <li class="nav-item"><a class="nav-link" href="camaras.html"><i class="bi bi-camera-video"></i> Cámaras de Seguridad</a></li>
-          <li class="nav-item"><a class="nav-link active" href="redes.html"><i class="bi bi-wifi"></i> Puntos de Red</a></li>
-          <li class="nav-item"><a class="nav-link" href="apk.html"><i class="bi bi-android2"></i> Creación de APK</a></li>
-          <li class="nav-item"><a class="nav-link" href="tips.html"><i class="bi bi-phone"></i> Tips para Celulares</a></li>
+          <li class="nav-item"><a class="nav-link" href="camaras.html"><i class="bi bi-camera-video"></i> Cámaras</a></li>
+          <li class="nav-item"><a class="nav-link active" href="redes.html"><i class="bi bi-wifi"></i> Redes</a></li>
+          <li class="nav-item"><a class="nav-link" href="apk.html"><i class="bi bi-android2"></i> APK</a></li>
+          <li class="nav-item"><a class="nav-link" href="tips.html"><i class="bi bi-phone"></i> Tips</a></li>
         </ul>
       </div>
     </div>
   </nav>
-  <main class="container my-4">
 
-  <h2 class="text-center">Instalación de Redes</h2>
-  <p class="text-center">Redes cableadas e inalámbricas para oficinas, hogares y empresas.</p>
-  
-  <div class="text-center my-4">
-    <img src="imagenes/redes.jpg" alt="Servicio de instalación de redes" class="img-fluid rounded" />
-  </div>
+  <!-- Contenido -->
+  <main class="container my-5">
+    <h2 class="text-center mb-3">Instalación de Redes</h2>
+    <p class="text-center lead">Redes cableadas e inalámbricas para oficinas, hogares y empresas.</p>
 
-  <!-- NUEVO CONTENIDO -->
-  <section class="mt-5">
-    <h3 class="text-primary">Soluciones en Redes</h3>
-    <p>
-      Una buena red es la base para un flujo de trabajo rápido y confiable.  
-      Instalo y configuro redes adaptadas a tus necesidades, ya sea para tu hogar, oficina o negocio, 
-      asegurando estabilidad, velocidad y seguridad en la conexión.
-    </p>
-
-    <h4 class="mt-4 text-success">Servicios que ofrezco:</h4>
-    <ul>
-      <li>Instalación de redes cableadas (Ethernet) para máxima velocidad.</li>
-      <li>Configuración de redes Wi-Fi para cobertura total en tu espacio.</li>
-      <li>Instalación de puntos de acceso y repetidores de señal.</li>
-      <li>Organización y etiquetado de cableado de red.</li>
-      <li>Configuración de routers y firewalls para mayor seguridad.</li>
-    </ul>
-
-    <h4 class="mt-4 text-warning">Problemas comunes que resuelvo:</h4>
-    <ul>
-      <li>Conexiones lentas o intermitentes.</li>
-      <li>Áreas sin señal Wi-Fi (zonas muertas).</li>
-      <li>Conflictos de red o IP.</li>
-      <li>Caídas frecuentes de conexión.</li>
-      <li>Configuraciones inseguras que ponen en riesgo tus datos.</li>
-    </ul>
-
-    <h4 class="mt-4 text-info">Consejos para mejorar tu red:</h4>
-    <ol>
-      <li>Colocar el router en un punto central de la casa o negocio.</li>
-      <li>Usar cables de red de buena calidad para conexiones críticas.</li>
-      <li>Actualizar el firmware del router regularmente.</li>
-      <li>Proteger tu red con contraseña segura y encriptación WPA2/WPA3.</li>
-      <li>Separar la red de invitados para mayor seguridad.</li>
-    </ol>
-
-    <div class="alert alert-info mt-4">
-      💡 <strong>Tip:</strong> Un punto de acceso bien instalado puede eliminar las zonas sin señal y 
-      aumentar la velocidad de internet en toda la propiedad.
+    <div class="text-center my-4">
+      <img src="imagenes/redes.jpg" alt="Servicio de instalación de redes" class="img-fluid rounded shadow-lg" />
     </div>
-  </section>
 
-</main>
+    <section class="mt-5">
+      <h3 class="text-primary"><i class="bi bi-diagram-3"></i> Soluciones en Redes</h3>
+      <p>
+        Una buena red es la base para un flujo de trabajo rápido y confiable.  
+        Instalamos y configuramos redes adaptadas a tus necesidades, asegurando estabilidad, velocidad y seguridad.
+      </p>
 
-  <footer class="bg-dark text-white text-center py-3">
-    © 2025 Servicios Informáticos - Contacto: WhatsApp 8818-0392, 8614-8357, 8419-8178
+      <h4 class="mt-4 text-success"><i class="bi bi-check2-circle"></i> Servicios que ofrecemos:</h4>
+      <ul>
+        <li>Instalación de redes cableadas (Ethernet).</li>
+        <li>Configuración de redes Wi-Fi para cobertura total.</li>
+        <li>Instalación de puntos de acceso y repetidores.</li>
+        <li>Organización y etiquetado de cableado.</li>
+        <li>Configuración de routers y firewalls.</li>
+      </ul>
+
+      <h4 class="mt-4 text-warning"><i class="bi bi-exclamation-triangle"></i> Problemas comunes que resolvemos:</h4>
+      <ul>
+        <li>Conexiones lentas o intermitentes.</li>
+        <li>Áreas sin señal Wi-Fi (zonas muertas).</li>
+        <li>Conflictos de red o IP.</li>
+        <li>Caídas frecuentes de conexión.</li>
+        <li>Configuraciones inseguras.</li>
+      </ul>
+
+      <h4 class="mt-4 text-info"><i class="bi bi-lightbulb"></i> Consejos para mejorar tu red:</h4>
+      <ol>
+        <li>Colocar el router en un punto central.</li>
+        <li>Usar cables de calidad para conexiones críticas.</li>
+        <li>Actualizar el firmware del router.</li>
+        <li>Proteger tu red con WPA2/WPA3.</li>
+        <li>Separar la red de invitados.</li>
+      </ol>
+
+      <div class="alert alert-info mt-4 shadow-sm">
+        💡 <strong>Tip:</strong> Un punto de acceso bien instalado elimina zonas muertas y mejora tu velocidad de internet.
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-white text-center py-4">
+    <p class="mb-1">© 2025 Servicios Informáticos Rivas</p>
+    <p class="mb-0">📞 WhatsApp: <a href="https://wa.me/50588180392">8818-0392</a> | <a href="https://wa.me/50586148357">8614-8357</a> | <a href="https://wa.me/50584198178">8419-8178</a></p>
   </footer>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script src="https://cdn.botpress.cloud/webchat/v3.2/inject.js" defer></script>
-<script src="https://files.bpcontent.cloud/2025/08/11/23/20250811230929-AYMVBFEW.js" defer></script>
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.botpress.cloud/webchat/v3.2/inject.js" defer></script>
+  <script src="https://files.bpcontent.cloud/2025/08/11/23/20250811230929-AYMVBFEW.js" defer></script>
 </body>
 </html>
