@@ -159,19 +159,19 @@
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
- <!-- Modal de bienvenida -->
-<div class="modal fade" id="ubicacionModal" tabindex="-1" aria-labelledby="ubicacionModalLabel" aria-hidden="true">
+<!-- Modal multi-pasos -->
+<div class="modal fade" id="bienvenidaModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="ubicacionModalLabel">¡Hola!</h5>
+        <h5 class="modal-title">¡Bienvenido!</h5>
       </div>
-      <div class="modal-body">
-        ¿Nos visitas desde este hermoso municipio? Para ofrecerte un servicio más personalizado, necesitamos conocer tu ubicación exacta.
+      <div class="modal-body" id="modalBody">
+        ¿Nos visitas desde este hermoso municipio?
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="rechazarUbicacion">No, gracias</button>
-        <button type="button" class="btn btn-primary" id="aceptarUbicacion">Aceptar</button>
+      <div class="modal-footer" id="modalFooter">
+        <button type="button" class="btn btn-secondary" id="noBtn">No</button>
+        <button type="button" class="btn btn-primary" id="siBtn">Sí</button>
       </div>
     </div>
   </div>
@@ -179,52 +179,65 @@
 
 <script>
 window.addEventListener('DOMContentLoaded', () => {
-  const consentKey = 'ubicacion_consent';
-  const consent = localStorage.getItem(consentKey);
+  const modal = new bootstrap.Modal(document.getElementById('bienvenidaModal'));
+  const body = document.getElementById('modalBody');
+  const footer = document.getElementById('modalFooter');
 
-  const pedirUbicacion = () => {
-    if (!navigator.geolocation) return console.log('Tu navegador no soporta geolocalización');
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        const data = {
-          latitud: pos.coords.latitude,
-          longitud: pos.coords.longitude,
-          dispositivo: navigator.userAgent
-        };
+  let nombreUsuario = "";
 
-        fetch('https://script.google.com/macros/s/AKfycbzRve8tjes69fOgwjRcFvV6m5nIOI50EFYefVJ7VnukRO_orutLPmTIFiLJs09xnCUI/exec', {
-          method: 'POST',
-          body: JSON.stringify(data)
-        })
-        .then(r => r.json())
-        .then(resp => console.log("Guardado en Sheet:", resp))
-        .catch(err => console.error("Error enviando a Sheet:", err));
-      },
-      err => console.error('Error al obtener ubicación:', err)
-    );
-  };
-
-  // Si ya dio permiso antes, obtener ubicación automáticamente
-  if (consent === 'granted') {
-    pedirUbicacion();
-    return;
-  }
-
-  // Mostrar modal si no hay consentimiento o fue rechazado antes
-  const modal = new bootstrap.Modal(document.getElementById('ubicacionModal'));
+  // Mostrar modal al cargar
   modal.show();
 
-  document.getElementById('aceptarUbicacion').addEventListener('click', () => {
-    modal.hide();
-    localStorage.setItem(consentKey, 'granted');
-    pedirUbicacion();
-  });
+  // Paso 1: Pregunta inicial
+  function pasarAPedirNombre() {
+    body.innerHTML = `
+      <p>Para ofrecerte un servicio más personalizado, necesitamos conocer tu nombre.</p>
+      <input type="text" id="nombreInput" class="form-control" placeholder="Escribe tu nombre">
+    `;
+    footer.innerHTML = `
+      <button type="button" class="btn btn-primary" id="continuarNombreBtn">Continuar</button>
+    `;
+    agregarEventosPaso2();
+  }
 
-  document.getElementById('rechazarUbicacion').addEventListener('click', () => {
-    modal.hide();
-    // No guardamos nada, para que vuelva a preguntar la próxima vez
-    alert("Sin ubicación, no podremos ofrecer un servicio personalizado.");
-  });
+  document.getElementById('siBtn').addEventListener('click', pasarAPedirNombre);
+  document.getElementById('noBtn').addEventListener('click', pasarAPedirNombre);
+
+  // Paso 2: Pedir nombre
+  function agregarEventosPaso2() {
+    document.getElementById('continuarNombreBtn').addEventListener('click', () => {
+      const input = document.getElementById('nombreInput');
+      if (!input.value.trim()) {
+        alert("Por favor ingresa tu nombre");
+        return;
+      }
+      nombreUsuario = input.value.trim();
+
+      body.innerHTML = `
+        <p>Hola, <b>${nombreUsuario}</b>. Te ayudaremos a encontrar una solución a cualquier problema o inquietud que tengas.</p>
+        <p>Por favor ingresa a nuestro sitio web para poder ayudarte.</p>
+        <p>¿Quieres que te ayudemos?</p>
+      `;
+      footer.innerHTML = `
+        <button type="button" class="btn btn-secondary" id="noGraciasBtn">No, gracias</button>
+        <button type="button" class="btn btn-success" id="aceptarBtn">Aceptar</button>
+      `;
+      agregarEventosPaso3();
+    });
+  }
+
+  // Paso 3: Confirmación final
+  function agregarEventosPaso3() {
+    document.getElementById('aceptarBtn').addEventListener('click', () => {
+      modal.hide();
+      // Aquí entra normalmente al sitio
+    });
+
+    document.getElementById('noGraciasBtn').addEventListener('click', () => {
+      modal.hide();
+      document.body.innerHTML = "<h2 class='text-center mt-5 text-danger'>Acceso denegado</h2>";
+    });
+  }
 });
 </script>
 </body>
