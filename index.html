@@ -159,23 +159,23 @@
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Modal de bienvenida -->
-  <div class="modal fade" id="ubicacionModal" tabindex="-1" aria-labelledby="ubicacionModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="ubicacionModalLabel">¡Hola!</h5>
-        </div>
-        <div class="modal-body">
-          ¿Nos visitas desde este hermoso municipio? Para ofrecerte un servicio más personalizado, necesitamos conocer tu ubicación exacta.
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" id="rechazarUbicacion">No, gracias</button>
-          <button type="button" class="btn btn-primary" id="aceptarUbicacion">Aceptar</button>
-        </div>
+ <!-- Modal de bienvenida -->
+<div class="modal fade" id="ubicacionModal" tabindex="-1" aria-labelledby="ubicacionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ubicacionModalLabel">¡Hola!</h5>
+      </div>
+      <div class="modal-body">
+        ¿Nos visitas desde este hermoso municipio? Para ofrecerte un servicio más personalizado, necesitamos conocer tu ubicación exacta.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="rechazarUbicacion">No, gracias</button>
+        <button type="button" class="btn btn-primary" id="aceptarUbicacion">Aceptar</button>
       </div>
     </div>
   </div>
+</div>
 
 <script>
 window.addEventListener('DOMContentLoaded', () => {
@@ -187,17 +187,17 @@ window.addEventListener('DOMContentLoaded', () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((pos) => {
         const data = {
-          lat: pos.coords.latitude,
-          lon: pos.coords.longitude,
+          latitud: pos.coords.latitude,    // coincidir con Apps Script
+          longitud: pos.coords.longitude,  // coincidir con Apps Script
           dispositivo: navigator.userAgent
         };
 
-        fetch('https://script.google.com/macros/s/AKfycbwWYijOvQcgjLRQlkqF8pP7_p4T3e3OG0B4qUzZE5VnkPPQKjH3fjq2TVNJaljFZYi7/exec', {  // Reemplaza con tu URL de Apps Script
+        fetch('https://script.google.com/macros/s/AKfycbyVn4fyxcILLDc-hvWV8rtiGxJUJeKekyn4JaqAtasNxpcoL3G-a9i_bzZUh1TEfRs/exec', {  // Reemplaza con tu URL
           method: 'POST',
           body: JSON.stringify(data)
         })
-        .then(response => response.text())
-        .then(text => console.log("Guardado en Sheet:", text))
+        .then(response => response.json())
+        .then(resp => console.log("Guardado en Sheet:", resp))
         .catch(err => console.error("Error enviando a Sheet:", err));
 
       }, (err) => {
