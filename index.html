@@ -129,7 +129,40 @@
   <!-- Contenido -->
   <main class="container my-5">
     <div class="text-center my-4">
-      <img src="imagenes/servicios.jpg" alt="Servicio de reparación de PC" class="img-fluid rounded shadow" />
+      <!-- Carrusel de imágenes -->
+<div id="carouselServicios" class="carousel slide mb-5 shadow rounded" data-bs-ride="carousel">
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="imagenes/servicios.jpg" class="d-block w-100 rounded" alt="Servicio de reparación de PC">
+    </div>
+    <div class="carousel-item">
+      <img src="imagenes/reparacion.jpg" class="d-block w-100 rounded" alt="Reparación de laptops y PC">
+    </div>
+    <div class="carousel-item">
+      <img src="imagenes/camaras.jpg" class="d-block w-100 rounded" alt="Instalación de cámaras de seguridad">
+    </div>
+    <div class="carousel-item">
+      <img src="imagenes/redes.jpg" class="d-block w-100 rounded" alt="Configuración de redes">
+    </div>
+  </div>
+
+  <!-- Controles -->
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselServicios" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon"></span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselServicios" data-bs-slide="next">
+    <span class="carousel-control-next-icon"></span>
+  </button>
+
+  <!-- Indicadores -->
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#carouselServicios" data-bs-slide-to="0" class="active"></button>
+    <button type="button" data-bs-target="#carouselServicios" data-bs-slide-to="1"></button>
+    <button type="button" data-bs-target="#carouselServicios" data-bs-slide-to="2"></button>
+    <button type="button" data-bs-target="#carouselServicios" data-bs-slide-to="3"></button>
+  </div>
+</div>
+
     </div>
 
     <div class="text-center mb-5">
