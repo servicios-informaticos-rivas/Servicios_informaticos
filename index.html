@@ -159,23 +159,26 @@
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Modal multi-pasos -->
-<div class="modal fade" id="bienvenidaModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">¡Bienvenido!</h5>
-      </div>
-      <div class="modal-body" id="modalBody">
-        ¿Nos visitas desde este hermoso municipio?
-      </div>
-      <div class="modal-footer" id="modalFooter">
-        <button type="button" class="btn btn-secondary" id="noBtn">No</button>
-        <button type="button" class="btn btn-primary" id="siBtn">Sí</button>
+ <!-- Modal multi-pasos -->
+  <div class="modal fade" id="bienvenidaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">¡Bienvenido!</h5>
+        </div>
+        <div class="modal-body" id="modalBody">
+          ¿Nos visitas desde este hermoso municipio?
+        </div>
+        <div class="modal-footer" id="modalFooter">
+          <button type="button" class="btn btn-secondary" id="noBtn">No</button>
+          <button type="button" class="btn btn-primary" id="siBtn">Sí</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
 window.addEventListener('DOMContentLoaded', () => {
@@ -187,13 +190,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
   modal.show();
 
-  // Paso 1
+  // Paso 1: pedir nombre
   function pasarAPedirNombre() {
     body.innerHTML = `
       <p>Para ofrecerte un servicio más personalizado, necesitamos conocer tu nombre.</p>
-      <p>¡Confia en Nosotros!</p>
-      <p>Toda la Informacion Otorgada Es muy Clasificada.</p>
-      <input type="text" id="nombreInput" class="form-control" placeholder="Escribe tu nombre">
+      <div class="mb-2 text-muted"><small>Tus datos son confidenciales.</small></div>
+      <input type="text" id="nombreInput" class="form-control" placeholder="Escribe tu nombre" autofocus>
+      <div id="errorMsg" class="text-danger mt-2" style="display:none;">Por favor ingresa tu nombre.</div>
     `;
     footer.innerHTML = `
       <button type="button" class="btn btn-primary" id="continuarNombreBtn">Continuar</button>
@@ -204,19 +207,21 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('siBtn').addEventListener('click', pasarAPedirNombre);
   document.getElementById('noBtn').addEventListener('click', pasarAPedirNombre);
 
-  // Paso 2
+  // Paso 2: Validar nombre
   function agregarEventosPaso2() {
     document.getElementById('continuarNombreBtn').addEventListener('click', () => {
       const input = document.getElementById('nombreInput');
+      const errorMsg = document.getElementById('errorMsg');
+
       if (!input.value.trim()) {
-        alert("Por favor ingresa tu nombre");
+        errorMsg.style.display = "block";
         return;
       }
-      nombreUsuario = input.value.trim();
 
+      nombreUsuario = input.value.trim();
       body.innerHTML = `
-        <p>Hola, <b>${nombreUsuario}</b>. Te ayudaremos a encontrar una solución a cualquier problema o inquietud que tengas.</p>
-        <p>¿Quieres que te ayudemos?</p>
+        <p>Hola, <b>${nombreUsuario}</b>. Te ayudaremos a encontrar una solución.</p>
+        <p>¿Quieres que te apoyemos?</p>
       `;
       footer.innerHTML = `
         <button type="button" class="btn btn-secondary" id="noGraciasBtn">No, gracias</button>
@@ -226,10 +231,9 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Parsear el userAgent
+  // Detectar navegador y SO
   function parseUserAgent(ua) {
     let navegador = "Desconocido", os = "Desconocido", arquitectura = "Desconocido";
-
     if (ua.includes("Chrome")) navegador = "Chrome";
     else if (ua.includes("Firefox")) navegador = "Firefox";
     else if (ua.includes("Safari") && !ua.includes("Chrome")) navegador = "Safari";
@@ -247,10 +251,21 @@ window.addEventListener('DOMContentLoaded', () => {
     return { navegador, os, arquitectura };
   }
 
-  // Paso 3
+  // Enviar datos a Google Sheets
+  function enviarDatos(data) {
+    fetch('https://script.google.com/macros/s/AKfycbwcSaXYhxWGbvumI23PbUgyjQ6e50uwODyrdaiTv9Vr6QLSoZ9-C4cF0BSy4yj0dYzc/exec', {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(resp => console.log("Guardado en Sheet:", resp))
+    .catch(err => console.error("Error enviando a Sheet:", err));
+  }
+
+  // Paso 3: Guardar datos
   function agregarEventosPaso3() {
     document.getElementById('aceptarBtn').addEventListener('click', () => {
-      // Sacar IP primero
       fetch('https://api.ipify.org?format=json')
         .then(res => res.json())
         .then(ipResp => {
@@ -258,32 +273,36 @@ window.addEventListener('DOMContentLoaded', () => {
           const ua = navigator.userAgent;
           const { navegador, os, arquitectura } = parseUserAgent(ua);
           const resolucion = `${screen.width}x${screen.height}`;
+          const fecha = new Date().toLocaleString();
+
+          let data = {
+            nombre: nombreUsuario,
+            ip: ip,
+            navegador: navegador,
+            os: os,
+            arquitectura: arquitectura,
+            dispositivo: ua,
+            pantalla: resolucion,
+            fecha: fecha,
+            latitud: "No proporcionada",
+            longitud: "No proporcionada"
+          };
 
           if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((pos) => {
-              const data = {
-                nombre: nombreUsuario,
-                latitud: pos.coords.latitude,
-                longitud: pos.coords.longitude,
-                ip: ip,
-                dispositivo: ua,
-                navegador: navegador,
-                os: os,
-                arquitectura: arquitectura,
-                pantalla: resolucion
-              };
-
-              fetch('https://script.google.com/macros/s/AKfycbwcSaXYhxWGbvumI23PbUgyjQ6e50uwODyrdaiTv9Vr6QLSoZ9-C4cF0BSy4yj0dYzc/exec', {
-                method: 'POST',
-                body: JSON.stringify(data)
-              })
-              .then(r => r.json())
-              .then(resp => console.log("Guardado en Sheet:", resp))
-              .catch(err => console.error("Error enviando a Sheet:", err));
+              data.latitud = pos.coords.latitude;
+              data.longitud = pos.coords.longitude;
+              enviarDatos(data);
+            }, () => {
+              enviarDatos(data); // si niega permiso igual guardamos
             });
+          } else {
+            enviarDatos(data);
           }
         });
+
       modal.hide();
+      document.body.insertAdjacentHTML("beforeend", "<div class='alert alert-success text-center mt-3'>✅ Gracias " + nombreUsuario + ", hemos registrado tu visita.</div>");
     });
 
     document.getElementById('noGraciasBtn').addEventListener('click', () => {
