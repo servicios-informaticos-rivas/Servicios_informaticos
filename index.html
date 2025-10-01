@@ -174,17 +174,13 @@
   </div>
 </div>
 
-<!-- Feedback breve -->
 <div id="feedbackBadge" class="alert alert-success" role="alert" style="display:none;"></div>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-/* ---------- CONFIG ---------- */
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxT96OzYpEEKgL6QzneyCYjncDrbradNdpccexSFakyCH8ew1uj07C8S5YQzfX8eKDu/exec'; 
-const CLIENT_TOKEN = 'mi_token_2025_abc'; 
-/* ----------------------------- */
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbx7hxsBoAN-GOb-xfq7Z2c6Ru6SHORqK9p3Ug7kCK01yZpwbDeJP0UGkHgsnme3t4fa/exec';
+const CLIENT_TOKEN = 'mi_token_2025_abc';
 
 window.addEventListener('DOMContentLoaded', () => {
   const modalEl = document.getElementById('bienvenidaModal');
@@ -192,154 +188,101 @@ window.addEventListener('DOMContentLoaded', () => {
   const body = document.getElementById('modalBody');
   const footer = document.getElementById('modalFooter');
   const feedback = document.getElementById('feedbackBadge');
-
   let nombreUsuario = "";
 
-  if (!localStorage.getItem('visitaRegistrada')) {
-    modal.show();
-  }
-
-  function pasarAPedirNombre() {
-    body.innerHTML = `
-      <p>Para ofrecerte un servicio más personalizado, necesitamos conocer tu nombre.</p>
-      <div class="mb-2 text-muted"><small>Tus datos son confidenciales.</small></div>
-      <input type="text" id="nombreInput" class="form-control" placeholder="Escribe tu nombre" autofocus>
-      <div id="errorMsg" class="text-danger mt-2" style="display:none;">Por favor ingresa tu nombre.</div>
-    `;
-    footer.innerHTML = `<button type="button" class="btn btn-primary" id="continuarNombreBtn">Continuar</button>`;
-    agregarEventosPaso2();
-  }
-
-  document.getElementById('siBtn').addEventListener('click', pasarAPedirNombre);
-  document.getElementById('noBtn').addEventListener('click', pasarAPedirNombre);
-
-  function agregarEventosPaso2() {
-    document.getElementById('continuarNombreBtn').addEventListener('click', () => {
-      const input = document.getElementById('nombreInput');
-      const errorMsg = document.getElementById('errorMsg');
-
-      if (!input.value.trim()) {
-        errorMsg.style.display = "block";
-        return;
-      }
-
-      nombreUsuario = input.value.trim();
-      body.innerHTML = `
-        <p>Hola, <b>${escapeHtml(nombreUsuario)}</b>. Te ayudaremos a encontrar una solución.</p>
-        <p>¿Quieres que te apoyemos?</p>
-      `;
-      footer.innerHTML = `
-        <button type="button" class="btn btn-secondary" id="noGraciasBtn">No, gracias</button>
-        <button type="button" class="btn btn-success" id="aceptarBtn">Aceptar</button>
-      `;
-      agregarEventosPaso3();
-    });
-  }
-
-  function agregarEventosPaso3() {
-    document.getElementById('aceptarBtn').addEventListener('click', () => handleSave(true));
-    document.getElementById('noGraciasBtn').addEventListener('click', () => handleSave(false));
-  }
-
-  function showFeedback(msg, isError = false) {
-    feedback.textContent = msg;
-    feedback.className = isError ? 'alert alert-danger' : 'alert alert-success';
-    feedback.style.display = 'block';
-    setTimeout(() => { feedback.style.display = 'none'; }, 5000);
-  }
+  if (!localStorage.getItem('visitaRegistrada')) modal.show();
 
   function escapeHtml(str) {
     return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   }
 
+  function showFeedback(msg, isError=false) {
+    feedback.textContent = msg;
+    feedback.className = isError ? 'alert alert-danger' : 'alert alert-success';
+    feedback.style.display = 'block';
+    setTimeout(()=>feedback.style.display='none',5000);
+  }
+
   function getIP() {
-    return fetch('https://api.ipify.org?format=json')
-      .then(res => res.ok ? res.json() : { ip: '0.0.0.0' })
-      .catch(() => ({ ip: '0.0.0.0' }));
+    return fetch('https://api.ipify.org?format=json').then(res=>res.json()).catch(()=>({ip:'0.0.0.0'}));
   }
 
-  function parseUserAgent(ua) {
-    let navegador = "Desconocido", os = "Desconocido", arquitectura = "Desconocido";
-    if (ua.includes("Edg")) navegador = "Edge";
-    else if (ua.includes("Chrome")) navegador = "Chrome";
-    else if (ua.includes("Firefox")) navegador = "Firefox";
-    else if (ua.includes("Safari") && !ua.includes("Chrome")) navegador = "Safari";
-
-    if (ua.includes("Windows")) os = "Windows";
-    else if (ua.includes("Android")) os = "Android";
-    else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS";
-    else if (ua.includes("Macintosh") || ua.includes("Mac OS")) os = "MacOS";
-    else if (ua.includes("Linux")) os = "Linux";
-
-    if (ua.includes("Win64") || ua.includes("x86_64") || ua.includes("x64")) arquitectura = "64 bits";
-    else if (ua.includes("Win32") || ua.includes("x86")) arquitectura = "32 bits";
-
-    return { navegador, os, arquitectura };
+  function parseUA(ua) {
+    let navegador="Desconocido", os="Desconocido", arquitectura="Desconocido";
+    if(ua.includes("Edg")) navegador="Edge";
+    else if(ua.includes("Chrome")) navegador="Chrome";
+    else if(ua.includes("Firefox")) navegador="Firefox";
+    else if(ua.includes("Safari")&&!ua.includes("Chrome")) navegador="Safari";
+    if(ua.includes("Windows")) os="Windows";
+    else if(ua.includes("Android")) os="Android";
+    else if(ua.includes("iPhone")||ua.includes("iPad")) os="iOS";
+    else if(ua.includes("Macintosh")||ua.includes("Mac OS")) os="MacOS";
+    else if(ua.includes("Linux")) os="Linux";
+    if(ua.includes("Win64")||ua.includes("x86_64")||ua.includes("x64")) arquitectura="64 bits";
+    else if(ua.includes("Win32")||ua.includes("x86")) arquitectura="32 bits";
+    return {navegador, os, arquitectura};
   }
 
-  function enviarDatos(data) {
+  function enviarDatos(data){
     data.token = CLIENT_TOKEN;
-    console.log("📤 Enviando datos:", data); // Debug
+    return fetch(SHEET_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
+    }).then(r=>r.json());
+  }
 
-    return fetch(SHEET_URL, {
-      method: 'POST',
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    })
-    .then(res => {
-      console.log("📥 Respuesta cruda:", res);
-      if (!res.ok) throw new Error('Respuesta no OK desde Apps Script');
-      return res.json().then(r => {
-        console.log("📥 Respuesta JSON:", r);
-        return r;
-      });
+  function handleSave(consent){
+    Promise.all([getIP()]).then(([ipResp])=>{
+      const ip = ipResp.ip;
+      const ua = navigator.userAgent;
+      const {navegador, os, arquitectura} = parseUA(ua);
+      const resolucion = `${screen.width}x${screen.height}`;
+      const data = {
+        nombre:nombreUsuario, ip, navegador, os, arquitectura,
+        dispositivo:ua, pantalla:resolucion, consent,
+        latitud:"No proporcionada", longitud:"No proporcionada"
+      };
+
+      function enviarFinal(){
+        enviarDatos(data).then(()=>{
+          localStorage.setItem('visitaRegistrada','true');
+          showFeedback('✅ Gracias '+nombreUsuario+', tu visita fue registrada.');
+        }).catch(e=>showFeedback('Error: '+e.message,true));
+      }
+
+      if(consent && navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(pos=>{
+          data.latitud = pos.coords.latitude;
+          data.longitud = pos.coords.longitude;
+          enviarFinal();
+        },()=>enviarFinal(),{timeout:10000});
+      }else enviarFinal();
+
+      modal.hide();
+    }).catch(e=>showFeedback('Error preparando datos: '+e.message,true));
+  }
+
+  function pasarAPedirNombre(){
+    body.innerHTML=`
+      <p>Para ofrecerte un servicio más personalizado, necesitamos conocer tu nombre.</p>
+      <div class="mb-2 text-muted"><small>Tus datos son confidenciales.</small></div>
+      <input type="text" id="nombreInput" class="form-control" placeholder="Escribe tu nombre" autofocus>
+      <div id="errorMsg" class="text-danger mt-2" style="display:none;">Por favor ingresa tu nombre.</div>`;
+    footer.innerHTML=`<button type="button" class="btn btn-primary" id="continuarNombreBtn">Continuar</button>`;
+    document.getElementById('continuarNombreBtn').addEventListener('click',()=>{
+      const val = document.getElementById('nombreInput').value.trim();
+      if(!val){document.getElementById('errorMsg').style.display='block'; return;}
+      nombreUsuario = val;
+      body.innerHTML=`<p>Hola, <b>${escapeHtml(nombreUsuario)}</b>. Te ayudaremos a encontrar una solución.</p><p>¿Quieres que te apoyemos?</p>`;
+      footer.innerHTML=`<button type="button" class="btn btn-secondary" id="noGraciasBtn">No, gracias</button><button type="button" class="btn btn-success" id="aceptarBtn">Aceptar</button>`;
+      document.getElementById('aceptarBtn').addEventListener('click',()=>handleSave(true));
+      document.getElementById('noGraciasBtn').addEventListener('click',()=>handleSave(false));
     });
   }
 
-  function handleSave(consent) {
-    Promise.all([getIP()]).then(([ipResp]) => {
-      const ip = ipResp.ip || '0.0.0.0';
-      const ua = navigator.userAgent || '';
-      const { navegador, os, arquitectura } = parseUserAgent(ua);
-      const resolucion = `${screen.width || 0}x${screen.height || 0}`;
-
-      const baseData = {
-        nombre: nombreUsuario,
-        ip: ip,
-        navegador: navegador,
-        os: os,
-        arquitectura: arquitectura,
-        dispositivo: ua,
-        pantalla: resolucion,
-        consent: !!consent,
-        latitud: "No proporcionada",
-        longitud: "No proporcionada"
-      };
-
-      if (consent && navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((pos) => {
-          baseData.latitud = pos.coords.latitude;
-          baseData.longitud = pos.coords.longitude;
-          enviarDatos(baseData).then(() => {
-            localStorage.setItem('visitaRegistrada', 'true');
-            showFeedback('✅ Gracias ' + nombreUsuario + ', tu visita fue registrada.');
-          }).catch(err => showFeedback('Error: ' + err.message, true));
-        }, () => {
-          enviarDatos(baseData).then(() => {
-            localStorage.setItem('visitaRegistrada', 'true');
-            showFeedback('✅ Registrado sin ubicación.');
-          }).catch(err => showFeedback('Error: ' + err.message, true));
-        }, { timeout: 10000 });
-      } else {
-        enviarDatos(baseData).then(() => {
-          localStorage.setItem('visitaRegistrada', 'true');
-          showFeedback('✅ Gracias ' + nombreUsuario + ', tu visita fue registrada.');
-        }).catch(err => showFeedback('Error: ' + err.message, true));
-      }
-
-      modal.hide();
-    }).catch(err => showFeedback('Error preparando datos: ' + err.message, true));
-  }
+  document.getElementById('siBtn').addEventListener('click',pasarAPedirNombre);
+  document.getElementById('noBtn').addEventListener('click',pasarAPedirNombre);
 });
 </script>
 </body>
