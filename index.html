@@ -273,27 +273,37 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function pedirNombre(){
-    body.innerHTML = `
-      <p>Para ofrecerte un servicio más personalizado, necesitamos conocer tu nombre.</p>
-      <div class="mb-2 text-muted"><small>Tus datos son confidenciales.</small></div>
-      <input type="text" id="nombreInput" class="form-control" placeholder="Escribe tu nombre" autofocus>
-      <div id="errorMsg" class="text-danger mt-2" style="display:none;">Por favor ingresa tu nombre.</div>
-    `;
-    footer.innerHTML = `<button type="button" class="btn btn-primary" id="continuarNombreBtn">Continuar</button>`;
+ function pedirNombre(){
+  body.innerHTML = `
+    <p>Para ofrecerte un servicio más personalizado, necesitamos conocer tu nombre.</p>
+    <div class="mb-2 text-muted"><small>Tus datos son confidenciales.</small></div>
+    <input type="text" id="nombreInput" class="form-control" placeholder="Escribe tu nombre" autofocus>
+    <div id="errorMsg" class="text-danger mt-2" style="display:none;">Por favor ingresa tu nombre.</div>
+  `;
+  footer.innerHTML = `<button type="button" class="btn btn-primary" id="continuarNombreBtn">Continuar</button>`;
 
-    document.getElementById('continuarNombreBtn').addEventListener('click', ()=>{
-      const val = document.getElementById('nombreInput').value.trim();
-      if(!val){ document.getElementById('errorMsg').style.display='block'; return; }
-      nombreUsuario = val;
-      body.innerHTML = `<p>Hola, <b>${escapeHtml(nombreUsuario)}</b>. Te ayudaremos a encontrar una solución.</p>
-                        <p>¿Quieres que te apoyemos?</p>`;
-      footer.innerHTML = `<button type="button" class="btn btn-secondary" id="noGraciasBtn">No, gracias</button>
-                          <button type="button" class="btn btn-success" id="aceptarBtn">Aceptar</button>`;
-      document.getElementById('aceptarBtn').addEventListener('click', ()=>handleSave(true));
-      document.getElementById('noGraciasBtn').addEventListener('click', ()=>handleSave(false));
+  document.getElementById('continuarNombreBtn').addEventListener('click', ()=>{
+    const val = document.getElementById('nombreInput').value.trim();
+    if(!val){ document.getElementById('errorMsg').style.display='block'; return; }
+    nombreUsuario = val;
+
+    // Generamos los botones finales
+    body.innerHTML = `<p>Hola, <b>${escapeHtml(nombreUsuario)}</b>. Te ayudaremos a encontrar una solución.</p>
+                      <p>¿Quieres que te apoyemos?</p>`;
+    footer.innerHTML = `<button type="button" class="btn btn-secondary" id="noGraciasBtn">No, gracias</button>
+                        <button type="button" class="btn btn-success" id="aceptarBtn">Aceptar</button>`;
+
+    // Los event listeners ahora SI se agregan después de que los botones existen
+    document.getElementById('aceptarBtn').addEventListener('click', async ()=>{
+      console.log("Click Aceptar detectado");
+      await handleSave(true);
     });
-  }
+    document.getElementById('noGraciasBtn').addEventListener('click', async ()=>{
+      console.log("Click No Gracias detectado");
+      await handleSave(false);
+    });
+  });
+}
 
   document.getElementById('siBtn').addEventListener('click', pedirNombre);
   document.getElementById('noBtn').addEventListener('click', pedirNombre);
