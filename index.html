@@ -156,8 +156,8 @@
     </p>
   </footer>
 
- <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Bootstrap Bundle (JS + Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- Modal multi-pasos -->
 <div class="modal fade" id="bienvenidaModal" tabindex="-1" aria-hidden="true">
@@ -185,15 +185,23 @@ window.addEventListener('DOMContentLoaded', () => {
 
   let nombreUsuario = "";
 
+  // Si el usuario ya permitió ubicación, enviar datos automáticamente
+  if (localStorage.getItem("permitioUbicacion") === "true") {
+    const nombreGuardado = localStorage.getItem("nombreUsuario") || "Anónimo";
+    enviarDatosAlSheet(nombreGuardado);
+    return; // no mostrar modal
+  }
+
+  // Si no se ha mostrado el modal antes, mostrarlo
   if (!localStorage.getItem("modalMostrado")) {
-  modal.show();
-}
+    modal.show();
+  }
 
   // Paso 1
   function pasarAPedirNombre() {
     body.innerHTML = `
       <p>Para ofrecerte un servicio más personalizado, necesitamos conocer tu nombre.</p>
-      <p>La Informacion Brindada Es Confidencial.</p>
+      <p>La información brindada es confidencial.</p>
       <input type="text" id="nombreInput" class="form-control" placeholder="Escribe tu nombre">
     `;
     footer.innerHTML = `
@@ -227,7 +235,61 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Parsear el userAgent
+  // Paso 3
+  function agregarEventosPaso3() {
+    document.getElementById('aceptarBtn').addEventListener('click', () => {
+      // Guardar en localStorage
+      localStorage.setItem("modalMostrado", "true");
+      localStorage.setItem("permitioUbicacion", "true");
+      localStorage.setItem("nombreUsuario", nombreUsuario);
+
+      enviarDatosAlSheet(nombreUsuario);
+      modal.hide();
+    });
+
+    document.getElementById('noGraciasBtn').addEventListener('click', () => {
+      modal.hide();
+      document.body.innerHTML = "<h2 class='text-center mt-5 text-danger'>Acceso denegado</h2>";
+    });
+  }
+
+  // Función para enviar datos al Sheet
+  function enviarDatosAlSheet(nombreUsuario) {
+    fetch('https://api.ipify.org?format=json')
+      .then(res => res.json())
+      .then(ipResp => {
+        const ip = ipResp.ip;
+        const ua = navigator.userAgent;
+        const { navegador, os, arquitectura } = parseUserAgent(ua);
+        const resolucion = `${screen.width}x${screen.height}`;
+
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((pos) => {
+            const data = {
+              nombre: nombreUsuario || "Desconocido",
+              latitud: pos.coords.latitude,
+              longitud: pos.coords.longitude,
+              ip: ip,
+              dispositivo: ua,
+              navegador: navegador,
+              os: os,
+              arquitectura: arquitectura,
+              pantalla: resolucion
+            };
+
+            fetch('https://script.google.com/macros/s/AKfycbzmCy4PK0oXrYCNC1wHaNKkhvd26prvRyRl_aD3m7cEW65KyYHRhElGaJM3eSQtFjau/exec', {
+              method: 'POST',
+              body: JSON.stringify(data)
+            })
+            .then(r => r.json())
+            .then(resp => console.log("Guardado en Sheet:", resp))
+            .catch(err => console.error("Error enviando a Sheet:", err));
+          });
+        }
+      });
+  }
+
+  // Parsear user agent
   function parseUserAgent(ua) {
     let navegador = "Desconocido", os = "Desconocido", arquitectura = "Desconocido";
 
@@ -246,53 +308,6 @@ window.addEventListener('DOMContentLoaded', () => {
     else if (ua.includes("Win32") || ua.includes("x86")) arquitectura = "32 bits";
 
     return { navegador, os, arquitectura };
-  }
-
-  // Paso 3
-  function agregarEventosPaso3() {
-    document.getElementById('aceptarBtn').addEventListener('click', () => {
-      // Sacar IP primero
-      fetch('https://api.ipify.org?format=json')
-        .then(res => res.json())
-        .then(ipResp => {
-          const ip = ipResp.ip;
-          const ua = navigator.userAgent;
-          const { navegador, os, arquitectura } = parseUserAgent(ua);
-          const resolucion = `${screen.width}x${screen.height}`;
-
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((pos) => {
-              const data = {
-                nombre: nombreUsuario,
-                latitud: pos.coords.latitude,
-                longitud: pos.coords.longitude,
-                ip: ip,
-                dispositivo: ua,
-                navegador: navegador,
-                os: os,
-                arquitectura: arquitectura,
-                pantalla: resolucion
-              };
-
-              fetch('https://script.google.com/macros/s/AKfycbzmCy4PK0oXrYCNC1wHaNKkhvd26prvRyRl_aD3m7cEW65KyYHRhElGaJM3eSQtFjau/exec', {
-                method: 'POST',
-                body: JSON.stringify(data)
-              })
-              .then(r => r.json())
-              .then(resp => console.log("Guardado en Sheet:", resp))
-              .catch(err => console.error("Error enviando a Sheet:", err));
-            });
-          }
-        });
-      localStorage.setItem("modalMostrado", "true");
-
-      modal.hide();
-    });
-
-    document.getElementById('noGraciasBtn').addEventListener('click', () => {
-      modal.hide();
-      document.body.innerHTML = "<h2 class='text-center mt-5 text-danger'>Acceso denegado</h2>";
-    });
   }
 });
 </script>
