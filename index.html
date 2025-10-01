@@ -156,7 +156,7 @@
     </p>
   </footer>
 
-<!-- Modal multi-pasos -->
+<!-- Modal -->
 <div class="modal fade" id="bienvenidaModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -179,7 +179,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwe5yGy96-NiJt3TRloAkdsQc66hTtyNH7wZTckOjyNBWM9zY5XpW2DbzxlqRHVRDt4/exec'; // Pega la URL de tu Web App
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzPiTbEia22ehOZI9TGgmzuusqSyHP22MLYVKGmt1XoLfMXxq4I5cG52MPlx43ZpIQ/exec'; // Pega tu URL de Web App
 const CLIENT_TOKEN = 'mi_token_2025_abc';
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -192,24 +192,23 @@ window.addEventListener('DOMContentLoaded', () => {
 
   if (!localStorage.getItem('visitaRegistrada')) modal.show();
 
-  function escapeHtml(str) {
-    return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  }
-
-  function showFeedback(msg, isError=false) {
+  function showFeedback(msg, isError=false){
     feedback.textContent = msg;
     feedback.className = isError ? 'alert alert-danger' : 'alert alert-success';
     feedback.style.display = 'block';
     setTimeout(()=>feedback.style.display='none',5000);
   }
 
-  function getIP() {
-    return fetch('https://api.ipify.org?format=json')
-      .then(res=>res.json())
-      .catch(()=>({ip:'0.0.0.0'}));
+  function escapeHtml(str){
+    return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   }
 
-  function parseUA(ua) {
+  function getIP(){
+    return fetch('https://api.ipify.org?format=json')
+      .then(r=>r.json()).catch(()=>({ip:'0.0.0.0'}));
+  }
+
+  function parseUA(ua){
     let navegador="Desconocido", os="Desconocido", arquitectura="Desconocido";
     if(ua.includes("Edg")) navegador="Edge";
     else if(ua.includes("Chrome")) navegador="Chrome";
@@ -227,11 +226,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
   function enviarDatos(data){
     data.token = CLIENT_TOKEN;
+    // Usar JSONP-like de GAS para evitar CORS
     return fetch(SHEET_URL,{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
       body:JSON.stringify(data),
-      mode:'cors'
+      headers:{'Content-Type':'application/json'}
     }).then(r=>r.json());
   }
 
@@ -243,8 +242,10 @@ window.addEventListener('DOMContentLoaded', () => {
       const resolucion = `${screen.width}x${screen.height}`;
       const data = {
         nombre:nombreUsuario, ip, navegador, os, arquitectura,
-        dispositivo:ua, pantalla:resolucion, consent,
-        latitud:"No proporcionada", longitud:"No proporcionada"
+        dispositivo:ua, pantalla:resolucion,
+        consent,
+        latitud:"No proporcionada",
+        longitud:"No proporcionada"
       };
 
       function enviarFinal(){
@@ -273,11 +274,10 @@ window.addEventListener('DOMContentLoaded', () => {
       <input type="text" id="nombreInput" class="form-control" placeholder="Escribe tu nombre" autofocus>
       <div id="errorMsg" class="text-danger mt-2" style="display:none;">Por favor ingresa tu nombre.</div>`;
     footer.innerHTML=`<button type="button" class="btn btn-primary" id="continuarNombreBtn">Continuar</button>`;
-
     document.getElementById('continuarNombreBtn').addEventListener('click',()=>{
-      const val = document.getElementById('nombreInput').value.trim();
+      const val=document.getElementById('nombreInput').value.trim();
       if(!val){document.getElementById('errorMsg').style.display='block'; return;}
-      nombreUsuario = val;
+      nombreUsuario=val;
       body.innerHTML=`<p>Hola, <b>${escapeHtml(nombreUsuario)}</b>. Te ayudaremos a encontrar una solución.</p><p>¿Quieres que te apoyemos?</p>`;
       footer.innerHTML=`<button type="button" class="btn btn-secondary" id="noGraciasBtn">No, gracias</button><button type="button" class="btn btn-success" id="aceptarBtn">Aceptar</button>`;
       document.getElementById('aceptarBtn').addEventListener('click',()=>handleSave(true));
