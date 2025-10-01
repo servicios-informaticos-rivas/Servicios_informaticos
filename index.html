@@ -156,10 +156,7 @@
     </p>
   </footer>
 
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
- <!-- Modal multi-pasos -->
+  <!-- Modal multi-pasos -->
   <div class="modal fade" id="bienvenidaModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -177,15 +174,31 @@
     </div>
   </div>
 
+  <!-- Feedback breve (toast-like) -->
+  <div id="feedbackBadge" class="alert alert-success" role="alert"></div>
+
+  <!-- Bootstrap JS (solo UNA vez) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
+/* ---------- CONFIG: cambia estas dos cosas ---------- */
+const SHEET_URL = 'TU_URL_DE_APPS_SCRIPT_AQUI'; // <-- pega la URL de tu Web App (Apps Script deploy)
+const CLIENT_TOKEN = 'CAMBIA_ESTA_TOKEN_POR_ALGO_SEGURO'; // <-- cambia por un token y úsalo también en Apps Script
+/* --------------------------------------------------- */
+
 window.addEventListener('DOMContentLoaded', () => {
-  const modal = new bootstrap.Modal(document.getElementById('bienvenidaModal'));
+  const modalEl = document.getElementById('bienvenidaModal');
+  const modal = new bootstrap.Modal(modalEl);
   const body = document.getElementById('modalBody');
   const footer = document.getElementById('modalFooter');
+  const feedback = document.getElementById('feedbackBadge');
 
   let nombreUsuario = "";
 
-  modal.show();
+  // Mostrar modal solo si no se registró antes
+  if (!localStorage.getItem('visitaRegistrada')) {
+    modal.show();
+  }
 
   // Paso 1: pedir nombre
   function pasarAPedirNombre() {
@@ -204,7 +217,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('siBtn').addEventListener('click', pasarAPedirNombre);
   document.getElementById('noBtn').addEventListener('click', pasarAPedirNombre);
 
-  // Paso 2: Validar nombre
+  // Paso 2: Validar nombre y mostrar opciones
   function agregarEventosPaso2() {
     document.getElementById('continuarNombreBtn').addEventListener('click', () => {
       const input = document.getElementById('nombreInput');
@@ -217,7 +230,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
       nombreUsuario = input.value.trim();
       body.innerHTML = `
-        <p>Hola, <b>${nombreUsuario}</b>. Te ayudaremos a encontrar una solución.</p>
+        <p>Hola, <b>${escapeHtml(nombreUsuario)}</b>. Te ayudaremos a encontrar una solución.</p>
         <p>¿Quieres que te apoyemos?</p>
       `;
       footer.innerHTML = `
@@ -228,84 +241,154 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Detectar navegador y SO
+  // Paso 3: attach events a aceptar y no gracias
+  function agregarEventosPaso3() {
+    const aceptarBtn = document.getElementById('aceptarBtn');
+    const noGraciasBtn = document.getElementById('noGraciasBtn');
+
+    aceptarBtn.addEventListener('click', () => {
+      // Consent true -> solicitamos geolocalización
+      handleSave(true, aceptarBtn);
+    });
+
+    noGraciasBtn.addEventListener('click', () => {
+      // Consent false -> no solicitamos geolocalización, pero guardamos el resto
+      handleSave(false, noGraciasBtn);
+    });
+  }
+
+  // Muestra feedback temporal
+  function showFeedback(msg, isError = false) {
+    feedback.textContent = msg;
+    feedback.className = isError ? 'alert alert-danger' : 'alert alert-success';
+    feedback.style.display = 'block';
+    setTimeout(() => { feedback.style.display = 'none'; }, 5000);
+  }
+
+  // Escapa HTML simple para evitar inyección en este contexto
+  function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  // Obtener IP pública (api.ipify)
+  function getIP() {
+    return fetch('https://api.ipify.org?format=json')
+      .then(res => res.ok ? res.json() : { ip: '0.0.0.0' })
+      .catch(() => ({ ip: '0.0.0.0' }));
+  }
+
+  // Parse basic userAgent
   function parseUserAgent(ua) {
     let navegador = "Desconocido", os = "Desconocido", arquitectura = "Desconocido";
-    if (ua.includes("Chrome")) navegador = "Chrome";
+    if (ua.includes("Edg")) navegador = "Edge";
+    else if (ua.includes("Chrome")) navegador = "Chrome";
     else if (ua.includes("Firefox")) navegador = "Firefox";
     else if (ua.includes("Safari") && !ua.includes("Chrome")) navegador = "Safari";
-    else if (ua.includes("Edg")) navegador = "Edge";
 
     if (ua.includes("Windows")) os = "Windows";
     else if (ua.includes("Android")) os = "Android";
     else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS";
-    else if (ua.includes("Mac OS")) os = "MacOS";
+    else if (ua.includes("Macintosh") || ua.includes("Mac OS")) os = "MacOS";
     else if (ua.includes("Linux")) os = "Linux";
 
-    if (ua.includes("Win64") || ua.includes("x86_64")) arquitectura = "64 bits";
+    if (ua.includes("Win64") || ua.includes("x86_64") || ua.includes("x64")) arquitectura = "64 bits";
     else if (ua.includes("Win32") || ua.includes("x86")) arquitectura = "32 bits";
 
     return { navegador, os, arquitectura };
   }
 
-  // Enviar datos a Google Sheets
+  // Función genérica para enviar datos al Apps Script
   function enviarDatos(data) {
-    fetch('https://script.google.com/macros/s/AKfycbw8Xp2vEfsLqpflgQy3pgN6NrV7XIEVzIJeQEwDRWtIcbnrwqFZDYUNNep9EO4krTZV/exec', {
+    // agrega token al body
+    data.token = CLIENT_TOKEN;
+    return fetch(SHEET_URL, {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     })
-    .then(r => r.json())
-    .then(resp => console.log("Guardado en Sheet:", resp))
-    .catch(err => console.error("Error enviando a Sheet:", err));
+    .then(res => {
+      if (!res.ok) throw new Error('Respuesta no OK desde Apps Script');
+      return res.json().catch(() => ({ status: 'ok' }));
+    });
   }
 
-  // Paso 3: Guardar datos
-  function agregarEventosPaso3() {
-    document.getElementById('aceptarBtn').addEventListener('click', () => {
-      fetch('https://api.ipify.org?format=json')
-        .then(res => res.json())
-        .then(ipResp => {
-          const ip = ipResp.ip;
-          const ua = navigator.userAgent;
-          const { navegador, os, arquitectura } = parseUserAgent(ua);
-          const resolucion = `${screen.width}x${screen.height}`;
-          const fecha = new Date().toLocaleString();
+  // Maneja el flujo de guardado (consent = boolean)
+  function handleSave(consent, buttonEl) {
+    // Deshabilitar botón para evitar clicks multiples
+    if (buttonEl) {
+      buttonEl.disabled = true;
+      buttonEl.textContent = 'Enviando...';
+    }
 
-          let data = {
-            nombre: nombreUsuario,
-            ip: ip,
-            navegador: navegador,
-            os: os,
-            arquitectura: arquitectura,
-            dispositivo: ua,
-            pantalla: resolucion,
-            fecha: fecha,
-            latitud: "No proporcionada",
-            longitud: "No proporcionada"
-          };
+    Promise.all([ getIP() ])
+      .then(([ipResp]) => {
+        const ip = ipResp.ip || '0.0.0.0';
+        const ua = navigator.userAgent || '';
+        const { navegador, os, arquitectura } = parseUserAgent(ua);
+        const resolucion = `${screen.width || 0}x${screen.height || 0}`;
+        const fecha = new Date().toLocaleString();
 
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((pos) => {
-              data.latitud = pos.coords.latitude;
-              data.longitud = pos.coords.longitude;
-              enviarDatos(data);
-            }, () => {
-              enviarDatos(data); // si niega permiso igual guardamos
+        // Base de datos
+        const baseData = {
+          nombre: nombreUsuario,
+          ip: ip,
+          navegador: navegador,
+          os: os,
+          arquitectura: arquitectura,
+          dispositivo: ua,
+          pantalla: resolucion,
+          fecha: fecha,
+          consent: !!consent,
+          latitud: "No proporcionada",
+          longitud: "No proporcionada"
+        };
+
+        if (consent && navigator.geolocation) {
+          // solicitamos ubicación — si acepta, la agregamos; si niega, enviamos sin coords
+          navigator.geolocation.getCurrentPosition((pos) => {
+            baseData.latitud = pos.coords.latitude;
+            baseData.longitud = pos.coords.longitude;
+            enviarDatos(baseData)
+              .then(resp => {
+                localStorage.setItem('visitaRegistrada', 'true');
+                showFeedback('✅ Gracias ' + nombreUsuario + ', tu visita fue registrada.');
+              })
+              .catch(err => {
+                showFeedback('Error guardando datos: ' + err.message, true);
+                if (buttonEl) { buttonEl.disabled = false; buttonEl.textContent = consent ? 'Aceptar' : 'No, gracias'; }
+              });
+          }, (err) => {
+            // usuario negó ubicación o error -> guardamos sin coords
+            enviarDatos(baseData)
+              .then(resp => {
+                localStorage.setItem('visitaRegistrada', 'true');
+                showFeedback('✅ Gracias ' + nombreUsuario + ', tu visita fue registrada (sin ubicación).');
+              })
+              .catch(err => {
+                showFeedback('Error guardando datos: ' + err.message, true);
+                if (buttonEl) { buttonEl.disabled = false; buttonEl.textContent = consent ? 'Aceptar' : 'No, gracias'; }
+              });
+          }, { timeout: 10000 });
+        } else {
+          // No pedimos ubicación (consent=false o navegador no soporta)
+          enviarDatos(baseData)
+            .then(resp => {
+              localStorage.setItem('visitaRegistrada', 'true');
+              showFeedback('✅ Gracias ' + nombreUsuario + ', tu visita fue registrada.');
+            })
+            .catch(err => {
+              showFeedback('Error guardando datos: ' + err.message, true);
+              if (buttonEl) { buttonEl.disabled = false; buttonEl.textContent = consent ? 'Aceptar' : 'No, gracias'; }
             });
-          } else {
-            enviarDatos(data);
-          }
-        });
+        }
 
-      modal.hide();
-      document.body.insertAdjacentHTML("beforeend", "<div class='alert alert-success text-center mt-3'>✅ Gracias " + nombreUsuario + ", hemos registrado tu visita.</div>");
-    });
-
-    document.getElementById('noGraciasBtn').addEventListener('click', () => {
-      modal.hide();
-      document.body.innerHTML = "<h2 class='text-center mt-5 text-danger'>Acceso denegado</h2>";
-    });
+        // ocultar modal inmediatamente para mejorar UX
+        modal.hide();
+      })
+      .catch(err => {
+        showFeedback('Error preparando datos: ' + err.message, true);
+        if (buttonEl) { buttonEl.disabled = false; buttonEl.textContent = consent ? 'Aceptar' : 'No, gracias'; }
+      });
   }
 });
 </script>
