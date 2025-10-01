@@ -185,7 +185,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
   let nombreUsuario = "";
 
+  if (!localStorage.getItem("modalMostrado")) {
   modal.show();
+}
 
   // Paso 1
   function pasarAPedirNombre() {
@@ -282,6 +284,8 @@ window.addEventListener('DOMContentLoaded', () => {
             });
           }
         });
+      localStorage.setItem("modalMostrado", "true");
+
       modal.hide();
     });
 
