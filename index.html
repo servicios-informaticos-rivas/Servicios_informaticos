@@ -156,6 +156,9 @@
     </p>
   </footer>
 
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <!-- Modal multi-pasos -->
 <div class="modal fade" id="bienvenidaModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -174,142 +177,120 @@
   </div>
 </div>
 
-<div id="feedbackBadge" class="alert alert-success" role="alert" style="display:none;"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbziX5FmhTPrqpYj1oY_9BOhp_Xntucq0zMru0hmWrcdmMUMv9F2c76hS7cW0l02Ba7W/exec'; // Reemplaza con la URL final de tu Web App
-const CLIENT_TOKEN = 'mi_token_2025_abc';
-
 window.addEventListener('DOMContentLoaded', () => {
-  const modalEl = document.getElementById('bienvenidaModal');
-  const modal = new bootstrap.Modal(modalEl);
+  const modal = new bootstrap.Modal(document.getElementById('bienvenidaModal'));
   const body = document.getElementById('modalBody');
   const footer = document.getElementById('modalFooter');
-  const feedback = document.getElementById('feedbackBadge');
+
   let nombreUsuario = "";
 
-  if (!localStorage.getItem('visitaRegistrada')) modal.show();
+  modal.show();
 
-  function escapeHtml(str){
-    return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  }
-
-  function showFeedback(msg, isError=false){
-    feedback.textContent = msg;
-    feedback.className = isError ? 'alert alert-danger' : 'alert alert-success';
-    feedback.style.display = 'block';
-    setTimeout(()=>feedback.style.display='none',5000);
-  }
-
-  async function getIP(){
-    try {
-      const res = await fetch('https://api.ipify.org?format=json');
-      const data = await res.json();
-      return data.ip || '0.0.0.0';
-    } catch {
-      return '0.0.0.0';
-    }
-  }
-
-  function parseUA(ua){
-    let navegador="Desconocido", os="Desconocido", arquitectura="Desconocido";
-    if(ua.includes("Edg")) navegador="Edge";
-    else if(ua.includes("Chrome")) navegador="Chrome";
-    else if(ua.includes("Firefox")) navegador="Firefox";
-    else if(ua.includes("Safari")&&!ua.includes("Chrome")) navegador="Safari";
-
-    if(ua.includes("Windows")) os="Windows";
-    else if(ua.includes("Android")) os="Android";
-    else if(ua.includes("iPhone")||ua.includes("iPad")) os="iOS";
-    else if(ua.includes("Macintosh")||ua.includes("Mac OS")) os="MacOS";
-    else if(ua.includes("Linux")) os="Linux";
-
-    if(ua.includes("Win64")||ua.includes("x86_64")||ua.includes("x64")) arquitectura="64 bits";
-    else if(ua.includes("Win32")||ua.includes("x86")) arquitectura="32 bits";
-
-    return {navegador, os, arquitectura};
-  }
-
-  async function enviarDatos(data){
-    data.token = CLIENT_TOKEN;
-    console.log("📤 Enviando datos:", data);
-    const res = await fetch(SHEET_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(data)
-    });
-    const json = await res.json();
-    console.log("📥 Respuesta Web App:", json);
-    return json;
-  }
-
-  async function handleSave(consent){
-    try {
-      const ip = await getIP();
-      const ua = navigator.userAgent;
-      const {navegador, os, arquitectura} = parseUA(ua);
-      const resolucion = `${screen.width}x${screen.height}`;
-
-      const data = {
-        nombre:nombreUsuario, ip, navegador, os, arquitectura,
-        dispositivo:ua, pantalla:resolucion,
-        consent,
-        latitud:"No proporcionada",
-        longitud:"No proporcionada"
-      };
-
-      function enviarFinal(){
-        enviarDatos(data).then(()=>{
-          localStorage.setItem('visitaRegistrada','true');
-          showFeedback('✅ Gracias '+nombreUsuario+', tu visita fue registrada.');
-        }).catch(e=>{
-          console.error(e);
-          showFeedback('Error enviando datos: '+e.message,true);
-        });
-      }
-
-      if(consent && navigator.geolocation){
-        navigator.geolocation.getCurrentPosition(
-          pos=>{
-            data.latitud = pos.coords.latitude;
-            data.longitud = pos.coords.longitude;
-            enviarFinal();
-          },
-          ()=>enviarFinal(),
-          {timeout:10000}
-        );
-      } else enviarFinal();
-
-      modal.hide();
-    } catch(e){
-      showFeedback('Error preparando datos: '+e.message,true);
-    }
-  }
-
-  function pedirNombre(){
-    body.innerHTML=`
+  // Paso 1
+  function pasarAPedirNombre() {
+    body.innerHTML = `
       <p>Para ofrecerte un servicio más personalizado, necesitamos conocer tu nombre.</p>
-      <div class="mb-2 text-muted"><small>Tus datos son confidenciales.</small></div>
-      <input type="text" id="nombreInput" class="form-control" placeholder="Escribe tu nombre" autofocus>
-      <div id="errorMsg" class="text-danger mt-2" style="display:none;">Por favor ingresa tu nombre.</div>`;
-    footer.innerHTML=`<button type="button" class="btn btn-primary" id="continuarNombreBtn">Continuar</button>`;
+      <p>¡Confia en Nosotros!</p>
+      <p>Toda la Informacion Otorgada Es muy Clasificada.</p>
+      <input type="text" id="nombreInput" class="form-control" placeholder="Escribe tu nombre">
+    `;
+    footer.innerHTML = `
+      <button type="button" class="btn btn-primary" id="continuarNombreBtn">Continuar</button>
+    `;
+    agregarEventosPaso2();
+  }
 
-    document.getElementById('continuarNombreBtn').addEventListener('click',()=>{
-      const val = document.getElementById('nombreInput').value.trim();
-      if(!val){document.getElementById('errorMsg').style.display='block'; return;}
-      nombreUsuario = val;
-      body.innerHTML=`<p>Hola, <b>${escapeHtml(nombreUsuario)}</b>. Te ayudaremos a encontrar una solución.</p><p>¿Quieres que te apoyemos?</p>`;
-      footer.innerHTML=`<button type="button" class="btn btn-secondary" id="noGraciasBtn">No, gracias</button>
-                        <button type="button" class="btn btn-success" id="aceptarBtn">Aceptar</button>`;
-      document.getElementById('aceptarBtn').addEventListener('click',()=>handleSave(true));
-      document.getElementById('noGraciasBtn').addEventListener('click',()=>handleSave(false));
+  document.getElementById('siBtn').addEventListener('click', pasarAPedirNombre);
+  document.getElementById('noBtn').addEventListener('click', pasarAPedirNombre);
+
+  // Paso 2
+  function agregarEventosPaso2() {
+    document.getElementById('continuarNombreBtn').addEventListener('click', () => {
+      const input = document.getElementById('nombreInput');
+      if (!input.value.trim()) {
+        alert("Por favor ingresa tu nombre");
+        return;
+      }
+      nombreUsuario = input.value.trim();
+
+      body.innerHTML = `
+        <p>Hola, <b>${nombreUsuario}</b>. Te ayudaremos a encontrar una solución a cualquier problema o inquietud que tengas.</p>
+        <p>¿Quieres que te ayudemos?</p>
+      `;
+      footer.innerHTML = `
+        <button type="button" class="btn btn-secondary" id="noGraciasBtn">No, gracias</button>
+        <button type="button" class="btn btn-success" id="aceptarBtn">Aceptar</button>
+      `;
+      agregarEventosPaso3();
     });
   }
 
-  document.getElementById('siBtn').addEventListener('click',pedirNombre);
-  document.getElementById('noBtn').addEventListener('click',pedirNombre);
+  // Parsear el userAgent
+  function parseUserAgent(ua) {
+    let navegador = "Desconocido", os = "Desconocido", arquitectura = "Desconocido";
+
+    if (ua.includes("Chrome")) navegador = "Chrome";
+    else if (ua.includes("Firefox")) navegador = "Firefox";
+    else if (ua.includes("Safari") && !ua.includes("Chrome")) navegador = "Safari";
+    else if (ua.includes("Edg")) navegador = "Edge";
+
+    if (ua.includes("Windows")) os = "Windows";
+    else if (ua.includes("Android")) os = "Android";
+    else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS";
+    else if (ua.includes("Mac OS")) os = "MacOS";
+    else if (ua.includes("Linux")) os = "Linux";
+
+    if (ua.includes("Win64") || ua.includes("x86_64")) arquitectura = "64 bits";
+    else if (ua.includes("Win32") || ua.includes("x86")) arquitectura = "32 bits";
+
+    return { navegador, os, arquitectura };
+  }
+
+  // Paso 3
+  function agregarEventosPaso3() {
+    document.getElementById('aceptarBtn').addEventListener('click', () => {
+      // Sacar IP primero
+      fetch('https://api.ipify.org?format=json')
+        .then(res => res.json())
+        .then(ipResp => {
+          const ip = ipResp.ip;
+          const ua = navigator.userAgent;
+          const { navegador, os, arquitectura } = parseUserAgent(ua);
+          const resolucion = `${screen.width}x${screen.height}`;
+
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((pos) => {
+              const data = {
+                nombre: nombreUsuario,
+                latitud: pos.coords.latitude,
+                longitud: pos.coords.longitude,
+                ip: ip,
+                dispositivo: ua,
+                navegador: navegador,
+                os: os,
+                arquitectura: arquitectura,
+                pantalla: resolucion
+              };
+
+              fetch('https://script.google.com/macros/s/AKfycbwuxxNhV-bK8bpkGLzWJbcd0mPjD4LYKgpgqvsa4IzRmKV2MiJmJIijvj42_EykaqVB/exec', {
+                method: 'POST',
+                body: JSON.stringify(data)
+              })
+              .then(r => r.json())
+              .then(resp => console.log("Guardado en Sheet:", resp))
+              .catch(err => console.error("Error enviando a Sheet:", err));
+            });
+          }
+        });
+      modal.hide();
+    });
+
+    document.getElementById('noGraciasBtn').addEventListener('click', () => {
+      modal.hide();
+      document.body.innerHTML = "<h2 class='text-center mt-5 text-danger'>Acceso denegado</h2>";
+    });
+  }
 });
 </script>
 </body>
