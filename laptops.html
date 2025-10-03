@@ -21,61 +21,43 @@
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-    .header-hero h1 {
-      font-weight: bold;
-      animation: fadeInDown 1s ease;
-    }
-    .header-hero p {
-      font-size: 1.2rem;
-      animation: fadeInUp 1s ease;
-    }
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .header-hero h1 { font-weight: bold; animation: fadeInDown 1s ease; }
+    .header-hero p  { font-size: 1.2rem; animation: fadeInUp 1s ease; }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInUp   { from { opacity: 0; transform: translateY(20px); }  to { opacity: 1; transform: translateY(0); } }
 
     /* Navbar fija */
-    .navbar {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
+    .navbar { position: sticky; top: 0; z-index: 1000; }
+
+    /* Carrusel (banner) */
+    .carousel-item img {
+      height: 500px;
+      object-fit: cover;
+      border-radius: 15px;
     }
 
-    /* Imagen con hover */
-    img {
+    /* Imágenes de contenido (pequeñas) */
+    .content-img {
       border: 2px solid #ccc;
       transition: transform 0.3s ease;
       max-height: 220px;
+      width: auto;
     }
-    img:hover { transform: scale(1.05); }
+    .content-img:hover { transform: scale(1.05); }
 
-    /* Listas con íconos */
-    ul li::before {
-      content: "✔ ";
-      color: #28a745;
-      font-weight: bold;
-    }
-    ol li::marker {
-      color: #ffc107;
-      font-weight: bold;
-    }
+    /* Evitamos los "checks" en listas (no hay reglas ::before) */
+    ul, ol { /* estilos neutros para listas */ }
 
     /* Footer */
-    footer {
-      background: #111;
-      color: #aaa;
-    }
-    footer a {
-      color: #fff;
-      text-decoration: none;
-    }
-    footer a:hover {
-      text-decoration: underline;
-    }
+    footer { background: #111; color: #aaa; }
+    footer a { color: #fff; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    body { background-color: #f5f6fa; }
+
+    /* Tarjetas (si las usas) */
+    .service-card { transition: transform 0.3s ease, box-shadow 0.3s ease; border-radius: 15px; }
+    .service-card:hover { transform: translateY(-8px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
   </style>
 </head>
 <body>
@@ -108,12 +90,55 @@
     </div>
   </nav>
 
-  <!-- Contenido -->
+  <!-- Carrusel/Banner -->
   <main class="container my-5">
     <div class="text-center my-4">
-      <img src="imagenes/laptop.jpg" alt="Servicio de reparación de laptops" class="img-fluid rounded shadow" />
+      <div id="carouselLaptops" class="carousel slide mb-5 shadow rounded" data-bs-ride="carousel" data-bs-interval="4000">
+        <div class="carousel-inner">
+          <!-- Usa <picture> si tienes .webp + .jpg; si no, reemplaza por tu imagen existente -->
+          <div class="carousel-item active">
+            <picture>
+              <source srcset="imagenes/laptop1.webp" type="image/webp">
+              <img src="imagenes/lap1.webp" class="d-block w-100 rounded" alt="Reparación de laptops" loading="lazy">
+            </picture>
+          </div>
+          <div class="carousel-item">
+            <picture>
+              <source srcset="imagenes/laptop2.webp" type="image/webp">
+              <img src="imagenes/lap2.webp" class="d-block w-100 rounded" alt="Cambio de pantallas" loading="lazy">
+            </picture>
+          </div>
+          <div class="carousel-item">
+            <picture>
+              <source srcset="imagenes/laptop3.webp" type="image/webp">
+              <img src="imagenes/lap3.webp" class="d-block w-100 rounded" alt="Reemplazo de baterías" loading="lazy">
+            </picture>
+          </div>
+          <div class="carousel-item">
+            <picture>
+              <source srcset="imagenes/laptop4.webp" type="image/webp">
+              <img src="imagenes/lap4.webp" class="d-block w-100 rounded" alt="Optimización y mantenimiento" loading="lazy">
+            </picture>
+          </div>
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselLaptops" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselLaptops" data-bs-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </button>
+
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#carouselLaptops" data-bs-slide-to="0" class="active"></button>
+          <button type="button" data-bs-target="#carouselLaptops" data-bs-slide-to="1"></button>
+          <button type="button" data-bs-target="#carouselLaptops" data-bs-slide-to="2"></button>
+          <button type="button" data-bs-target="#carouselLaptops" data-bs-slide-to="3"></button>
+        </div>
+      </div>
     </div>
 
+    <!-- Contenido -->
     <section class="mt-5">
       <h3 class="text-primary"><i class="bi bi-gear"></i> Cuidado y Reparación de Laptops</h3>
       <p>
