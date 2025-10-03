@@ -45,23 +45,11 @@
       z-index: 1000;
     }
 
-    /* Imagen con efecto hover */
-    img {
-      border: 2px solid #ccc;
-      transition: transform 0.3s ease;
-      max-height: 220px;
-    }
-    img:hover { transform: scale(1.05); }
-
-    /* Listas más modernas */
-    ul li::before {
-      content: "✔ ";
-      color: #28a745;
-      font-weight: bold;
-    }
-    ol li::marker {
-      color: #ffc107;
-      font-weight: bold;
+    /* Carrusel */
+    .carousel-item img {
+      height: 500px;
+      object-fit: cover;
+      border-radius: 15px;
     }
 
     /* Footer moderno */
@@ -111,7 +99,27 @@
   <!-- Contenido -->
   <main class="container my-5">
     <div class="text-center my-4">
-      <img src="imagenes/Pc.jpg" alt="Servicio de reparación" class="img-fluid rounded shadow" />
+      <!-- Carrusel de imágenes -->
+      <div id="carouselReparacion" class="carousel slide mb-5 shadow rounded" data-bs-ride="carousel" data-bs-interval="4000">
+        <div class="carousel-inner">
+          <div class="carousel-item active"><img src="imagenes/reparacion1.jpg" class="d-block w-100" alt="Reparación de PC"></div>
+          <div class="carousel-item"><img src="imagenes/reparacion2.jpg" class="d-block w-100" alt="Mantenimiento de computadoras"></div>
+          <div class="carousel-item"><img src="imagenes/reparacion3.jpg" class="d-block w-100" alt="Cambio de piezas"></div>
+          <div class="carousel-item"><img src="imagenes/reparacion4.jpg" class="d-block w-100" alt="Optimización de sistema"></div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselReparacion" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselReparacion" data-bs-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </button>
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#carouselReparacion" data-bs-slide-to="0" class="active"></button>
+          <button type="button" data-bs-target="#carouselReparacion" data-bs-slide-to="1"></button>
+          <button type="button" data-bs-target="#carouselReparacion" data-bs-slide-to="2"></button>
+          <button type="button" data-bs-target="#carouselReparacion" data-bs-slide-to="3"></button>
+        </div>
+      </div>
     </div>
 
     <section class="mt-5">
