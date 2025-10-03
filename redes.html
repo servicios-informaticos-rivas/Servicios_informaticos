@@ -3,21 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Servicios Informáticos Rivas</title>
+  <title>Redes - Servicios Informáticos Rivas</title>
+
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
   <style>
     body { background-color: #f9f9f9; font-family: "Segoe UI", Roboto, sans-serif; }
-    img { border: 2px solid #ccc; transition: transform 0.3s ease; max-height: 220px; }
-    img:hover { transform: scale(1.05); }
 
-    /* Encabezado con gradiente animado */
-    header {
+    /* Encabezado degradado animado */
+    .header-hero {
+      height: 220px;
       background: linear-gradient(270deg, #007bff, #6610f2, #17a2b8);
       background-size: 600% 600%;
       animation: gradientMove 12s ease infinite;
       color: white;
-      padding: 3rem 1rem;
+      text-shadow: 1px 1px 6px rgba(0,0,0,0.5);
     }
     @keyframes gradientMove {
       0% { background-position: 0% 50%; }
@@ -25,55 +27,56 @@
       100% { background-position: 0% 50%; }
     }
 
-    header h1 { font-weight: 700; margin-bottom: 0.5rem; }
-    header p { font-size: 1.2rem; opacity: 0.9; }
+    .header-hero h1 { font-weight: 700; margin-bottom: 0.5rem; animation: fadeInDown 1s ease; }
+    .header-hero p { font-size: 1.2rem; opacity: 0.95; animation: fadeInUp 1s ease; }
 
-    /* Navbar moderno */
-    .navbar-nav .nav-link {
-      transition: color 0.3s ease, transform 0.2s ease;
-    }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px);} to {opacity:1; transform:translateY(0);} }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px);} to {opacity:1; transform:translateY(0);} }
+
+    /* Navbar */
+    .navbar { position: sticky; top: 0; z-index: 1000; }
     .navbar-nav .nav-link:hover {
       color: #0dcaf0 !important;
       transform: translateY(-2px);
+      transition: color 0.3s ease, transform 0.2s ease;
     }
 
-   /* Listas más modernas */
-    ul li::before {
-      content: "✔ ";
-      color: #28a745;
-      font-weight: bold;
+    /* Carrusel/banner */
+    .carousel-item img {
+      height: 500px;
+      object-fit: cover;
+      border-radius: 15px;
     }
-    ol li::marker {
-      color: #ffc107;
-      font-weight: bold;
-    }
+
+    /* Listas sin checks personalizados */
+    ul, ol { margin-left: 1rem; }
 
     /* Footer */
-    footer { background: #111; font-size: 0.9rem; }
+    footer { background: #111; font-size: 0.9rem; color: #aaa; }
     footer a { color: #0dcaf0; text-decoration: none; }
     footer a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
   <!-- Encabezado -->
-  <header class="text-center">
-    <h1><i class="bi bi-laptop"></i> Servicios Informáticos Rivas</h1>
-    <p>Reparación, Redes, Cámaras, Repuestos y más</p>
+  <header class="header-hero text-center d-flex flex-column justify-content-center align-items-center">
+    <h1><i class="bi bi-wifi"></i> Redes Informáticas</h1>
+    <p>Instalación y configuración de redes cableadas e inalámbricas</p>
   </header>
 
   <!-- Menú -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
     <div class="container">
-     <a class="navbar-brand fw-bold" href="#"><i class="bi bi-cpu"></i> MENU</a>
+      <a class="navbar-brand fw-bold" href="index.html"><i class="bi bi-cpu"></i> MENU</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navMenu">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house"></i> Inicio</a></li>
-          <li class="nav-item"><a class="nav-link" href="reparacion.html"><i class="bi bi-tools"></i> Reparación de PC</a></li>
+          <li class="nav-item"><a class="nav-link" href="reparacion.html"><i class="bi bi-tools"></i> Reparación</a></li>
           <li class="nav-item"><a class="nav-link" href="laptops.html"><i class="bi bi-laptop"></i> Laptops</a></li>
-          <li class="nav-item"><a class="nav-link" href="repuestos.html"><i class="bi bi-cpu"></i> Venta de Repuestos</a></li>
+          <li class="nav-item"><a class="nav-link" href="repuestos.html"><i class="bi bi-cpu"></i> Repuestos</a></li>
           <li class="nav-item"><a class="nav-link" href="camaras.html"><i class="bi bi-camera-video"></i> Cámaras</a></li>
           <li class="nav-item"><a class="nav-link active" href="redes.html"><i class="bi bi-wifi"></i> Redes</a></li>
           <li class="nav-item"><a class="nav-link" href="apk.html"><i class="bi bi-android2"></i> APK</a></li>
@@ -83,20 +86,59 @@
     </div>
   </nav>
 
-  <!-- Contenido -->
+  <!-- Carrusel/Banner -->
   <main class="container my-5">
-    <h2 class="text-center mb-3">Instalación de Redes</h2>
-    <p class="text-center lead">Redes cableadas e inalámbricas para oficinas, hogares y empresas.</p>
-
     <div class="text-center my-4">
-      <img src="imagenes/redes.jpg" alt="Servicio de instalación de redes" class="img-fluid rounded shadow-lg" />
+      <div id="carouselRedes" class="carousel slide mb-5 shadow rounded" data-bs-ride="carousel" data-bs-interval="4000">
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <picture>
+              <source srcset="imagenes/red1.webp" type="image/webp">
+              <img src="imagenes/red1.jpg" class="d-block w-100 rounded" alt="Instalación de redes" loading="lazy">
+            </picture>
+          </div>
+          <div class="carousel-item">
+            <picture>
+              <source srcset="imagenes/red2.webp" type="image/webp">
+              <img src="imagenes/red2.jpg" class="d-block w-100 rounded" alt="Redes WiFi" loading="lazy">
+            </picture>
+          </div>
+          <div class="carousel-item">
+            <picture>
+              <source srcset="imagenes/red3.webp" type="image/webp">
+              <img src="imagenes/red3.jpg" class="d-block w-100 rounded" alt="Cableado estructurado" loading="lazy">
+            </picture>
+          </div>
+          <div class="carousel-item">
+            <picture>
+              <source srcset="imagenes/red4.webp" type="image/webp">
+              <img src="imagenes/red4.jpg" class="d-block w-100 rounded" alt="Configuración de routers" loading="lazy">
+            </picture>
+          </div>
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselRedes" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselRedes" data-bs-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </button>
+
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#carouselRedes" data-bs-slide-to="0" class="active"></button>
+          <button type="button" data-bs-target="#carouselRedes" data-bs-slide-to="1"></button>
+          <button type="button" data-bs-target="#carouselRedes" data-bs-slide-to="2"></button>
+          <button type="button" data-bs-target="#carouselRedes" data-bs-slide-to="3"></button>
+        </div>
+      </div>
     </div>
 
-    <section class="mt-5">
+    <!-- Contenido -->
+    <section>
       <h3 class="text-primary"><i class="bi bi-diagram-3"></i> Soluciones en Redes</h3>
       <p>
-        Una buena red es la base para un flujo de trabajo rápido y confiable.  
-        Instalamos y configuramos redes adaptadas a tus necesidades, asegurando estabilidad, velocidad y seguridad.
+        Una red estable es la base para un flujo de trabajo rápido y seguro.
+        Instalamos y configuramos redes adaptadas a tus necesidades, asegurando velocidad, cobertura y seguridad.
       </p>
 
       <h4 class="mt-4 text-success"><i class="bi bi-check2-circle"></i> Servicios que ofrecemos:</h4>
@@ -135,7 +177,11 @@
   <!-- Footer -->
   <footer class="text-white text-center py-4">
     <p class="mb-1">© 2025 Servicios Informáticos Rivas</p>
-    <p class="mb-0">📞 WhatsApp: <a href="https://wa.me/50588180392">8818-0392</a> | <a href="https://wa.me/50586148357">8614-8357</a> | <a href="https://wa.me/50584198178">8419-8178</a></p>
+    <p class="mb-0">📞 WhatsApp:
+      <a href="https://wa.me/50588180392">8818-0392</a> |
+      <a href="https://wa.me/50586148357">8614-8357</a> |
+      <a href="https://wa.me/50584198178">8419-8178</a>
+    </p>
   </footer>
 
   <!-- Scripts -->
