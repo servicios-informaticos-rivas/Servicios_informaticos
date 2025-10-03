@@ -4,11 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cámaras de Seguridad - Servicios Informáticos Rivas</title>
+
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
   <style>
-    /* Header degradado animado */
+    /* Fondo degradado animado para encabezado */
     .header-hero {
       height: 220px;
       background: linear-gradient(270deg, #007bff, #6610f2, #17a2b8);
@@ -21,69 +23,56 @@
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-    .header-hero h1 {
-      font-weight: bold;
-      animation: fadeInDown 1s ease;
-    }
-    .header-hero p {
-      font-size: 1.2rem;
-      animation: fadeInUp 1s ease;
-    }
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+
+    /* Animaciones del encabezado */
+    .animate-title { font-size: 2rem; font-weight: 700; opacity: 0; animation: fadeInUp 1s ease forwards; }
+    .animate-subtitle { font-size: 1.1rem; opacity: 0; animation: fadeInUp 1s ease forwards; animation-delay: 0.35s; }
+    .animate-icon { font-size: 2.4rem; opacity: 0; animation: fadeInScale 1s ease forwards; animation-delay: 0.6s; color: #ffd700; }
+
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInScale { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
 
     /* Navbar fija */
-    .navbar {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
+    .navbar { position: sticky; top: 0; z-index: 1000; }
+
+    /* Carrusel/banner */
+    .carousel-item img {
+      height: 500px;
+      object-fit: cover;
+      border-radius: 15px;
     }
 
-    /* Imagen con hover */
-    img {
+    /* Imágenes de contenido (pequeñas) */
+    .content-img {
       border: 2px solid #ccc;
       transition: transform 0.3s ease;
       max-height: 220px;
+      width: auto;
     }
-    img:hover { transform: scale(1.05); }
+    .content-img:hover { transform: scale(1.05); }
 
-    /* Listas con íconos */
-    ul li::before {
-      content: "✔ ";
-      color: #28a745;
-      font-weight: bold;
-    }
-    ol li::marker {
-      color: #ffc107;
-      font-weight: bold;
-    }
+    /* Listas neutras (sin checks) */
+    ul, ol { margin-left: 1rem; }
+
+    body { background-color: #f5f6fa; }
 
     /* Footer */
-    footer {
-      background: #111;
-      color: #aaa;
-    }
-    footer a {
-      color: #fff;
-      text-decoration: none;
-    }
-    footer a:hover {
-      text-decoration: underline;
-    }
+    footer { background: #111; color: #aaa; }
+    footer a { color: #fff; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* Tarjetas */
+    .service-card { transition: transform 0.3s ease, box-shadow 0.3s ease; border-radius: 15px; }
+    .service-card:hover { transform: translateY(-8px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
   </style>
 </head>
 <body>
 
-  <!-- Encabezado -->
+  <!-- Encabezado animado (con icono, título y subtítulo) -->
   <header class="header-hero text-white text-center d-flex flex-column justify-content-center align-items-center">
-    <h1><i class="bi bi-camera-video"></i> Cámaras de Seguridad</h1>
-    <p>Instalación de sistemas de videovigilancia para hogares, negocios y propiedades</p>
+    <i class="bi bi-camera-video animate-icon"></i>
+    <h1 class="animate-title">Cámaras de Seguridad</h1>
+    <p class="animate-subtitle">Instalación de sistemas de videovigilancia para hogares, negocios y propiedades</p>
   </header>
 
   <!-- Menú -->
@@ -108,12 +97,56 @@
     </div>
   </nav>
 
-  <!-- Contenido -->
+  <!-- Carrusel/Banner (debajo del menú) -->
   <main class="container my-5">
     <div class="text-center my-4">
-      <img src="imagenes/camaras.jpg" alt="Instalación de cámaras de seguridad" class="img-fluid rounded shadow" />
+      <div id="carouselCamaras" class="carousel slide mb-5 shadow rounded" data-bs-ride="carousel" data-bs-interval="4000">
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <picture>
+              <source srcset="imagenes/camaras1.webp" type="image/webp">
+              <img src="imagenes/camaras1.jpg" class="d-block w-100 rounded" alt="Cámaras de seguridad 1" loading="lazy">
+            </picture>
+          </div>
+          <div class="carousel-item">
+            <picture>
+              <source srcset="imagenes/camaras2.webp" type="image/webp">
+              <img src="imagenes/camaras2.jpg" class="d-block w-100 rounded" alt="Cámaras de seguridad 2" loading="lazy">
+            </picture>
+          </div>
+          <div class="carousel-item">
+            <picture>
+              <source srcset="imagenes/camaras3.webp" type="image/webp">
+              <img src="imagenes/camaras3.jpg" class="d-block w-100 rounded" alt="Instalación de cámaras" loading="lazy">
+            </picture>
+          </div>
+          <div class="carousel-item">
+            <picture>
+              <source srcset="imagenes/camaras4.webp" type="image/webp">
+              <img src="imagenes/camaras4.jpg" class="d-block w-100 rounded" alt="Videovigilancia profesional" loading="lazy">
+            </picture>
+          </div>
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselCamaras" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Anterior</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselCamaras" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Siguiente</span>
+        </button>
+
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#carouselCamaras" data-bs-slide-to="0" class="active" aria-label="Slide 1"></button>
+          <button type="button" data-bs-target="#carouselCamaras" data-bs-slide-to="1" aria-label="Slide 2"></button>
+          <button type="button" data-bs-target="#carouselCamaras" data-bs-slide-to="2" aria-label="Slide 3"></button>
+          <button type="button" data-bs-target="#carouselCamaras" data-bs-slide-to="3" aria-label="Slide 4"></button>
+        </div>
+      </div>
     </div>
 
+    <!-- Contenido -->
     <section>
       <h3 class="text-primary"><i class="bi bi-shield-lock"></i> Beneficios de instalar cámaras</h3>
       <ul>
@@ -149,9 +182,9 @@
   <footer class="text-center py-4">
     <p>© 2025 Servicios Informáticos Rivas</p>
     <p>
-      <i class="bi bi-whatsapp"></i> 
-      <a href="https://wa.me/50588180392" target="_blank">8818-0392</a> | 
-      <a href="https://wa.me/50586148357" target="_blank">8614-8357</a> | 
+      <i class="bi bi-whatsapp"></i>
+      <a href="https://wa.me/50588180392" target="_blank">8818-0392</a> |
+      <a href="https://wa.me/50586148357" target="_blank">8614-8357</a> |
       <a href="https://wa.me/50584198178" target="_blank">8419-8178</a>
     </p>
   </footer>
