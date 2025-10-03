@@ -10,37 +10,18 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
   <style>
-    /* Fondo degradado animado para encabezado */
-    .header-hero {
-      height: 320px;
-      background: linear-gradient(270deg, #007bff, #6610f2, #17a2b8);
-      background-size: 600% 600%;
-      animation: gradientMove 12s ease infinite;
-      text-shadow: 1px 1px 6px rgba(0,0,0,0.4);
-    }
-
-    @keyframes gradientMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* Animaciones */
-    .animate-title { font-size: 2.8rem; font-weight: bold; opacity: 0; animation: fadeInUp 1s ease forwards; }
-    .animate-subtitle { font-size: 1.3rem; opacity: 0; animation: fadeInUp 1s ease forwards; animation-delay: 0.5s; }
-    .animate-icon { font-size: 3rem; opacity: 0; animation: fadeInScale 1s ease forwards; animation-delay: 0.8s; color: #ffd700; }
-
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeInScale { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
-
-    /* Navbar fija */
+    /* Navbar sticky */
     .navbar { position: sticky; top: 0; z-index: 1000; }
 
-    /* Carrusel */
-    .carousel-item img { height: 500px; object-fit: cover; border-radius: 15px; }
+    /* Carrusel como banner principal */
+    .carousel-item img {
+      height: 500px;
+      object-fit: cover;
+      border-radius: 15px;
+    }
 
     /* Hover en imágenes */
-    img { border: 2px solid #ccc; transition: transform 0.3s ease; max-height: 220px; }
+    img { transition: transform 0.3s ease; }
     img:hover { transform: scale(1.05); }
 
     body { background-color: #f5f6fa; }
@@ -57,11 +38,36 @@
 </head>
 <body>
 
-  <!-- Encabezado -->
-  <header class="header-hero text-white text-center d-flex flex-column justify-content-center align-items-center">
-    <i class="bi bi-laptop animate-icon"></i>
-    <h1 class="animate-title">Servicios Informáticos Rivas</h1>
-    <p class="animate-subtitle">Reparación, Redes, Cámaras, Repuestos y más</p>
+  <!-- Carrusel Banner Principal -->
+  <header>
+    <div id="carouselServicios" class="carousel slide shadow rounded" data-bs-ride="carousel" data-bs-interval="4000">
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <img src="imagenes/servicios1.webp" class="d-block w-100" alt="Servicio de reparación de PC" loading="lazy">
+        </div>
+        <div class="carousel-item">
+          <img src="imagenes/reparacion1.webp" class="d-block w-100" alt="Reparación de laptops y PC" loading="lazy">
+        </div>
+        <div class="carousel-item">
+          <img src="imagenes/camaras1.webp" class="d-block w-100" alt="Instalación de cámaras de seguridad" loading="lazy">
+        </div>
+        <div class="carousel-item">
+          <img src="imagenes/redes1.webp" class="d-block w-100" alt="Configuración de redes" loading="lazy">
+        </div>
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#carouselServicios" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carouselServicios" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+      </button>
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#carouselServicios" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#carouselServicios" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#carouselServicios" data-bs-slide-to="2"></button>
+        <button type="button" data-bs-target="#carouselServicios" data-bs-slide-to="3"></button>
+      </div>
+    </div>
   </header>
 
   <!-- Menú -->
@@ -88,30 +94,6 @@
 
   <!-- Contenido -->
   <main class="container my-5">
-    <div class="text-center my-4">
-      <!-- Carrusel -->
-      <div id="carouselServicios" class="carousel slide mb-5 shadow rounded" data-bs-ride="carousel" data-bs-interval="4000">
-        <div class="carousel-inner">
-          <div class="carousel-item active"><img src="imagenes/servicios1.webp" class="d-block w-100 rounded" alt="Servicio de reparación de PC"></div>
-          <div class="carousel-item"><img src="imagenes/reparacion1.webp" class="d-block w-100 rounded" alt="Reparación de laptops y PC"></div>
-          <div class="carousel-item"><img src="imagenes/camaras1.webp" class="d-block w-100 rounded" alt="Instalación de cámaras de seguridad"></div>
-          <div class="carousel-item"><img src="imagenes/redes1.webp" class="d-block w-100 rounded" alt="Configuración de redes"></div>
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselServicios" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon"></span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselServicios" data-bs-slide="next">
-          <span class="carousel-control-next-icon"></span>
-        </button>
-        <div class="carousel-indicators">
-          <button type="button" data-bs-target="#carouselServicios" data-bs-slide-to="0" class="active"></button>
-          <button type="button" data-bs-target="#carouselServicios" data-bs-slide-to="1"></button>
-          <button type="button" data-bs-target="#carouselServicios" data-bs-slide-to="2"></button>
-          <button type="button" data-bs-target="#carouselServicios" data-bs-slide-to="3"></button>
-        </div>
-      </div>
-    </div>
-
     <div class="text-center mb-5">
       <h2 class="fw-bold">Bienvenido a Servicios Informáticos Rivas</h2>
       <p class="text-muted">Los equipos informáticos son esenciales en la sociedad moderna: nos ayudan a comunicarnos, aprender, trabajar y entretenernos. En SIR, cuidamos de tus dispositivos para que nunca te detengas.</p>
