@@ -193,19 +193,26 @@ window.addEventListener('DOMContentLoaded', () => {
   const modal = new bootstrap.Modal(document.getElementById('bienvenidaModal'));
   const body = document.getElementById('modalBody');
   const footer = document.getElementById('modalFooter');
-
   let nombreUsuario = "";
 
-  // Si el usuario ya permitió ubicación, enviar datos automáticamente
-  if (localStorage.getItem("permitioUbicacion") === "true") {
-    const nombreGuardado = localStorage.getItem("nombreUsuario") || "Anónimo";
-    enviarDatosAlSheet(nombreGuardado);
-    return; // no mostrar modal
-  }
-
-  // Si no se ha mostrado el modal antes, mostrarlo
-  if (!localStorage.getItem("modalMostrado")) {
-    modal.show();
+  // 🔑 Verificar permisos de ubicación
+  if (navigator.permissions) {
+    navigator.permissions.query({ name: "geolocation" }).then((result) => {
+      if (result.state === "granted") {
+        // Usuario ya aceptó → no volverá a preguntar
+        const nombreGuardado = localStorage.getItem("nombreUsuario") || "Anónimo";
+        enviarDatosAlSheet(nombreGuardado);
+        return;
+      } else if (result.state === "prompt") {
+        // Solo mostramos modal si aún no se mostró antes
+        if (!localStorage.getItem("modalMostrado")) {
+          modal.show();
+        }
+      } else if (result.state === "denied") {
+        console.warn("El usuario bloqueó la ubicación ❌");
+        // Aquí puedes mostrar un aviso o dejarlo pasar
+      }
+    });
   }
 
   // Paso 1
@@ -249,7 +256,6 @@ window.addEventListener('DOMContentLoaded', () => {
   // Paso 3
   function agregarEventosPaso3() {
     document.getElementById('aceptarBtn').addEventListener('click', () => {
-      // Guardar en localStorage
       localStorage.setItem("modalMostrado", "true");
       localStorage.setItem("permitioUbicacion", "true");
       localStorage.setItem("nombreUsuario", nombreUsuario);
@@ -264,7 +270,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Función para enviar datos al Sheet
+  // Enviar datos
   function enviarDatosAlSheet(nombreUsuario) {
     fetch('https://api.ipify.org?format=json')
       .then(res => res.json())
@@ -300,7 +306,7 @@ window.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  // Parsear user agent
+  // Analizar user agent
   function parseUserAgent(ua) {
     let navegador = "Desconocido", os = "Desconocido", arquitectura = "Desconocido";
 
