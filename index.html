@@ -189,30 +189,20 @@
 </div>
 
 <script>
-window.addEventListener('DOMContentLoaded', () => {
-  const modalEl = document.getElementById('bienvenidaModal');
+window.addEventListener("DOMContentLoaded", () => {
+  const modalEl = document.getElementById("bienvenidaModal");
   const modal = new bootstrap.Modal(modalEl);
-  const body = document.getElementById('modalBody');
-  const footer = document.getElementById('modalFooter');
+  const body = document.getElementById("modalBody");
+  const footer = document.getElementById("modalFooter");
 
-  // --- Helpers ---
-  function uuidv4() {
-    // Genera un id simple (suficiente para correlacionar en el Sheet)
-    return 'xxxxxx-xxxx-4xxx-yxxx-xxxxxx'.replace(/[xy]/g, function(c) {
-      const r = Math.random() * 16 | 0;
-      const v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    }) + '-' + Date.now();
-  }
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbzmCy4PK0oXrYCNC1wHaNKkhvd26prvRyRl_aD3m7cEW65KyYHRhElGaJM3eSQtFjau/exec";
 
-  function nowISO() {
-    return new Date().toISOString();
-  }
+  // 🔹 Utilidades
+  const uuid = () => "id-" + Math.random().toString(36).substring(2, 10) + Date.now();
+  const nowISO = () => new Date().toISOString();
 
-  // parsear user agent (tu función original)
   function parseUserAgent(ua) {
     let navegador = "Desconocido", os = "Desconocido", arquitectura = "Desconocido";
-
     if (ua.includes("Chrome") && !ua.includes("Edg")) navegador = "Chrome";
     else if (ua.includes("Firefox")) navegador = "Firefox";
     else if (ua.includes("Safari") && !ua.includes("Chrome")) navegador = "Safari";
@@ -225,206 +215,133 @@ window.addEventListener('DOMContentLoaded', () => {
     else if (ua.includes("Linux")) os = "Linux";
 
     if (ua.includes("Win64") || ua.includes("x86_64")) arquitectura = "64 bits";
-    else if (ua.includes("Win32") || ua.includes("x86")) arquitectura = "32 bits";
-
+    else arquitectura = "32 bits";
     return { navegador, os, arquitectura };
   }
 
-  // Función genérica para enviar al Apps Script (tu URL actual)
-  const SHEET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzmCy4PK0oXrYCNC1wHaNKkhvd26prvRyRl_aD3m7cEW65KyYHRhElGaJM3eSQtFjau/exec';
-
-  async function sendToSheet(payload) {
+  async function getPublicIP() {
     try {
-      const resp = await fetch(SHEET_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const j = await resp.json().catch(()=>null);
-      console.log("Envío a Sheet:", payload, j);
-      return j;
-    } catch (err) {
-      console.error("Error enviando a Sheet:", err, payload);
-      return null;
-    }
-  }
-
-  // Obtener IP pública
-  async function getPublicIp() {
-    try {
-      const r = await fetch('https://api.ipify.org?format=json');
-      const j = await r.json();
+      const res = await fetch("https://api.ipify.org?format=json");
+      const j = await res.json();
       return j.ip;
-    } catch (e) {
-      console.warn("No se pudo obtener IP pública:", e);
-      return "";
+    } catch {
+      return "Desconocida";
     }
   }
 
-  // Envío inicial (sin lat/lon)
-  async function enviarInicial(nombreUsuario, clientId) {
-    const ip = await getPublicIp();
+  async function sendToSheet(data) {
+    try {
+      const resp = await fetch(SHEET_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      console.log("Datos enviados:", data);
+    } catch (err) {
+      console.error("Error al enviar al Sheet:", err);
+    }
+  }
+
+  async function enviarDatosIniciales(nombre, clientId) {
+    const ip = await getPublicIP();
     const ua = navigator.userAgent;
     const { navegador, os, arquitectura } = parseUserAgent(ua);
     const resolucion = `${screen.width}x${screen.height}`;
 
     const payload = {
-      action: 'initial',          // indicativo para el Apps Script
-      clientId: clientId,
-      timestamp: nowISO(),
-      nombre: nombreUsuario || "Desconocido",
-      latitud: null,
-      longitud: null,
-      ip: ip || "",
-      dispositivo: ua,
-      navegador: navegador,
-      os: os,
-      arquitectura: arquitectura,
+      tipo: "inicial",
+      clientId,
+      nombre,
+      fecha: nowISO(),
+      ip,
+      navegador,
+      os,
+      arquitectura,
       pantalla: resolucion,
-      locationPending: true
+      userAgent: ua,
+      latitud: "",
+      longitud: ""
     };
 
     await sendToSheet(payload);
-    // guardar en localStorage para uso futuro
-    localStorage.setItem("modalMostrado", "true");
-    localStorage.setItem("nombreUsuario", nombreUsuario);
-    localStorage.setItem("clientId", clientId);
+    console.log("✅ Datos iniciales enviados");
+
+    // Intentar obtener ubicación enseguida
+    intentarObtenerUbicacion(clientId, nombre, ip, navegador, os, arquitectura, resolucion, ua);
   }
 
-  // Envío de actualización de ubicación (solo lat/lon)
-  async function enviarUbicacion(clientId, lat, lon, accuracy) {
-    const payload = {
-      action: 'location_update',
-      clientId: clientId,
-      timestamp: nowISO(),
-      latitud: lat,
-      longitud: lon,
-      accuracy: accuracy || null,
-      locationPending: false
-    };
-    await sendToSheet(payload);
-    // marcar que ya permitió ubicación
-    localStorage.setItem("permitioUbicacion", "true");
-  }
-
-  // Intentar obtener ubicación y, si la obtiene, enviar la actualización
-  function intentarObtenerUbicacion(clientId) {
+  function intentarObtenerUbicacion(clientId, nombre, ip, navegador, os, arquitectura, resolucion, ua) {
     if (!navigator.geolocation) return;
 
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        const acc = pos.coords.accuracy;
-        console.log("Geolocalización obtenida:", lat, lon, acc);
-        enviarUbicacion(clientId, lat, lon, acc);
+      pos => {
+        const { latitude, longitude, accuracy } = pos.coords;
+        const payload = {
+          tipo: "ubicacion",
+          clientId,
+          nombre,
+          fecha: nowISO(),
+          ip,
+          navegador,
+          os,
+          arquitectura,
+          pantalla: resolucion,
+          userAgent: ua,
+          latitud: latitude,
+          longitud: longitude,
+          precision: accuracy
+        };
+        sendToSheet(payload);
+        console.log("📍 Ubicación enviada:", latitude, longitude);
+        localStorage.setItem("permitioUbicacion", "true");
       },
-      (err) => {
-        console.warn("No se obtuvo geolocalización (por ahora):", err);
-        // Si denied, podemos intentar escuchar cambios de permiso
-        if (navigator.permissions) {
-          try {
-            navigator.permissions.query({ name: 'geolocation' }).then((perm) => {
-              perm.onchange = function() {
-                console.log("Cambio en permiso geolocation:", perm.state);
-                if (perm.state === 'granted') {
-                  intentarObtenerUbicacion(clientId);
-                }
-              };
-            });
-          } catch (e) {
-            // algunos navegadores no soportan onchange o query
-            console.warn("No se pudo usar navigator.permissions:", e);
-          }
-        }
-      },
-      { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+      err => console.warn("Ubicación no permitida:", err),
+      { enableHighAccuracy: true, timeout: 10000 }
     );
   }
 
-  // --- Flujo del modal (reutiliza parte de tu estructura) ---
-  let nombreUsuario = "";
+  // --- Flujo del modal ---
+  if (!localStorage.getItem("modalMostrado")) modal.show();
 
-  // Si ya existe clientId y permitioUbicacion ya era true, no mostrar modal (comportamiento opcional)
-  if (localStorage.getItem("permitioUbicacion") === "true" && localStorage.getItem("clientId")) {
-    // intentar enviar ubicación si falta (por si se quedó pendiente)
-    const cid = localStorage.getItem("clientId");
-    intentarObtenerUbicacion(cid);
-  }
-
-  if (!localStorage.getItem("modalMostrado")) {
-    modal.show();
-  }
-
-  function pasarAPedirNombre() {
+  function pedirNombre() {
     body.innerHTML = `
       <p>Para ofrecerte un servicio más personalizado, necesitamos conocer tu nombre.</p>
-      <p>La información brindada es confidencial.</p>
-      <input type="text" id="nombreInput" class="form-control" placeholder="Escribe tu nombre">
+      <input type="text" id="nombreInput" class="form-control mt-2" placeholder="Escribe tu nombre">
+    `;
+    footer.innerHTML = `<button type="button" class="btn btn-primary" id="continuarNombreBtn">Continuar</button>`;
+    document.getElementById("continuarNombreBtn").addEventListener("click", confirmarNombre);
+  }
+
+  function confirmarNombre() {
+    const input = document.getElementById("nombreInput");
+    const nombre = input.value.trim();
+    if (!nombre) return alert("Por favor ingresa tu nombre");
+
+    body.innerHTML = `
+      <p>Hola, <b>${nombre}</b>. ¿Deseas continuar?</p>
     `;
     footer.innerHTML = `
-      <button type="button" class="btn btn-primary" id="continuarNombreBtn">Continuar</button>
+      <button type="button" class="btn btn-secondary" id="noGraciasBtn">No</button>
+      <button type="button" class="btn btn-success" id="aceptarBtn">Sí</button>
     `;
-    agregarEventosPaso2();
-  }
 
-  document.getElementById('siBtn').addEventListener('click', pasarAPedirNombre);
-  document.getElementById('noBtn').addEventListener('click', pasarAPedirNombre);
-
-  function agregarEventosPaso2() {
-    document.getElementById('continuarNombreBtn').addEventListener('click', async () => {
-      const input = document.getElementById('nombreInput');
-      if (!input.value.trim()) {
-        alert("Por favor ingresa tu nombre");
-        return;
-      }
-      nombreUsuario = input.value.trim();
-
-      body.innerHTML = `
-        <p>Hola, <b>${nombreUsuario}</b>. Te ayudaremos a encontrar una solución a cualquier problema o inquietud que tengas.</p>
-        <p>¿Quieres que te ayudemos?</p>
-      `;
-      footer.innerHTML = `
-        <button type="button" class="btn btn-secondary" id="noGraciasBtn">No, gracias</button>
-        <button type="button" class="btn btn-success" id="aceptarBtn">Aceptar</button>
-      `;
-      agregarEventosPaso3();
-    });
-  }
-
-  function agregarEventosPaso3() {
-    document.getElementById('aceptarBtn').addEventListener('click', async () => {
-      const clientId = uuidv4();
-      // Guardamos el nombre y clientId inmediatamente
-      localStorage.setItem("nombreUsuario", nombreUsuario);
-      localStorage.setItem("clientId", clientId);
-
-      // Enviar datos iniciales INMEDIATAMENTE (sin lat/lon)
-      await enviarInicial(nombreUsuario, clientId);
-
-      // Intentar obtener ubicación en este momento (si el usuario permite, enviaremos la actualización)
-      intentarObtenerUbicacion(clientId);
-
-      modal.hide();
-    });
-
-    document.getElementById('noGraciasBtn').addEventListener('click', () => {
+    document.getElementById("noGraciasBtn").addEventListener("click", () => {
       modal.hide();
       document.body.innerHTML = "<h2 class='text-center mt-5 text-danger'>Acceso denegado</h2>";
     });
+
+    document.getElementById("aceptarBtn").addEventListener("click", async () => {
+      const clientId = uuid();
+      localStorage.setItem("modalMostrado", "true");
+      localStorage.setItem("nombreUsuario", nombre);
+      localStorage.setItem("clientId", clientId);
+      modal.hide();
+      await enviarDatosIniciales(nombre, clientId);
+    });
   }
 
-  // --- Adicional: si el usuario habilita ubicación desde la UI del navegador más tarde,
-  // el permiso.onchange lo detectará y enviará la ubicación con el mismo clientId. ---
-
-  // También: si quieres permitir que el usuario forcee el envío de ubicación desde un botón,
-  // puedes exponer esta función globalmente (opcional).
-  window.forceSendLocationIfPossible = function() {
-    const cid = localStorage.getItem("clientId");
-    if (!cid) return alert("No hay clientId registrado.");
-    intentarObtenerUbicacion(cid);
-  };
-
+  document.getElementById("siBtn").addEventListener("click", pedirNombre);
+  document.getElementById("noBtn").addEventListener("click", pedirNombre);
 });
 </script>
 </body>
