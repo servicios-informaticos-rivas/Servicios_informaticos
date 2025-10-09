@@ -199,18 +199,15 @@ window.addEventListener('DOMContentLoaded', () => {
   if (navigator.permissions) {
     navigator.permissions.query({ name: "geolocation" }).then((result) => {
       if (result.state === "granted") {
-        // Usuario ya aceptó → no volverá a preguntar
         const nombreGuardado = localStorage.getItem("nombreUsuario") || "Anónimo";
         enviarDatosAlSheet(nombreGuardado);
         return;
       } else if (result.state === "prompt") {
-        // Solo mostramos modal si aún no se mostró antes
         if (!localStorage.getItem("modalMostrado")) {
           modal.show();
         }
       } else if (result.state === "denied") {
         console.warn("El usuario bloqueó la ubicación ❌");
-        // Aquí puedes mostrar un aviso o dejarlo pasar
       }
     });
   }
@@ -270,7 +267,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Enviar datos
+  // 🔹 Enviar datos (modificado para guardar/reusar coordenadas)
   function enviarDatosAlSheet(nombreUsuario) {
     fetch('https://api.ipify.org?format=json')
       .then(res => res.json())
@@ -280,28 +277,63 @@ window.addEventListener('DOMContentLoaded', () => {
         const { navegador, os, arquitectura } = parseUserAgent(ua);
         const resolucion = `${screen.width}x${screen.height}`;
 
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition((pos) => {
-            const data = {
-              nombre: nombreUsuario || "Desconocido",
-              latitud: pos.coords.latitude,
-              longitud: pos.coords.longitude,
-              ip: ip,
-              dispositivo: ua,
-              navegador: navegador,
-              os: os,
-              arquitectura: arquitectura,
-              pantalla: resolucion
-            };
+        // Revisamos si ya hay coords guardadas
+        const coordsGuardadas = localStorage.getItem("coords");
+        if (coordsGuardadas) {
+          const { lat, lng } = JSON.parse(coordsGuardadas);
+          console.log("Usando coordenadas guardadas:", lat, lng);
 
-            fetch('https://script.google.com/macros/s/AKfycbzmCy4PK0oXrYCNC1wHaNKkhvd26prvRyRl_aD3m7cEW65KyYHRhElGaJM3eSQtFjau/exec', {
-              method: 'POST',
-              body: JSON.stringify(data)
-            })
-            .then(r => r.json())
-            .then(resp => console.log("Guardado en Sheet:", resp))
-            .catch(err => console.error("Error enviando a Sheet:", err));
-          });
+          const data = {
+            nombre: nombreUsuario || "Desconocido",
+            latitud: lat,
+            longitud: lng,
+            ip: ip,
+            dispositivo: ua,
+            navegador: navegador,
+            os: os,
+            arquitectura: arquitectura,
+            pantalla: resolucion
+          };
+
+          fetch('https://script.google.com/macros/s/AKfycbzmCy4PK0oXrYCNC1wHaNKkhvd26prvRyRl_aD3m7cEW65KyYHRhElGaJM3eSQtFjau/exec', {
+            method: 'POST',
+            body: JSON.stringify(data)
+          })
+          .then(r => r.json())
+          .then(resp => console.log("Guardado en Sheet:", resp))
+          .catch(err => console.error("Error enviando a Sheet:", err));
+
+        } else {
+          // Si no hay coords guardadas, pedimos ubicación
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((pos) => {
+              // Guardar coords
+              localStorage.setItem("coords", JSON.stringify({
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude
+              }));
+
+              const data = {
+                nombre: nombreUsuario || "Desconocido",
+                latitud: pos.coords.latitude,
+                longitud: pos.coords.longitude,
+                ip: ip,
+                dispositivo: ua,
+                navegador: navegador,
+                os: os,
+                arquitectura: arquitectura,
+                pantalla: resolucion
+              };
+
+              fetch('https://script.google.com/macros/s/AKfycbzmCy4PK0oXrYCNC1wHaNKkhvd26prvRyRl_aD3m7cEW65KyYHRhElGaJM3eSQtFjau/exec', {
+                method: 'POST',
+                body: JSON.stringify(data)
+              })
+              .then(r => r.json())
+              .then(resp => console.log("Guardado en Sheet:", resp))
+              .catch(err => console.error("Error enviando a Sheet:", err));
+            });
+          }
         }
       });
   }
